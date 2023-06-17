@@ -28,46 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            cell_1 = new TextBox();
-            cell_2 = new TextBox();
-            cell_3 = new TextBox();
-            cell_4 = new TextBox();
             buttonSet = new Button();
             buttonGet = new Button();
+            dataGridView1 = new DataGridView();
+            label1 = new Label();
+            label2 = new Label();
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
-            // 
-            // cell_1
-            // 
-            cell_1.Location = new Point(28, 52);
-            cell_1.Name = "cell_1";
-            cell_1.Size = new Size(100, 23);
-            cell_1.TabIndex = 1;
-            // 
-            // cell_2
-            // 
-            cell_2.Location = new Point(166, 53);
-            cell_2.Name = "cell_2";
-            cell_2.Size = new Size(100, 23);
-            cell_2.TabIndex = 2;
-            // 
-            // cell_3
-            // 
-            cell_3.Location = new Point(28, 114);
-            cell_3.Name = "cell_3";
-            cell_3.Size = new Size(100, 23);
-            cell_3.TabIndex = 3;
-            // 
-            // cell_4
-            // 
-            cell_4.Location = new Point(166, 114);
-            cell_4.Name = "cell_4";
-            cell_4.Size = new Size(100, 23);
-            cell_4.TabIndex = 4;
             // 
             // buttonSet
             // 
             buttonSet.Enabled = false;
-            buttonSet.Location = new Point(309, 52);
+            buttonSet.Location = new Point(690, 29);
             buttonSet.Name = "buttonSet";
             buttonSet.Size = new Size(75, 23);
             buttonSet.TabIndex = 5;
@@ -78,7 +50,7 @@
             // buttonGet
             // 
             buttonGet.Enabled = false;
-            buttonGet.Location = new Point(309, 114);
+            buttonGet.Location = new Point(690, 82);
             buttonGet.Name = "buttonGet";
             buttonGet.Size = new Size(75, 23);
             buttonGet.TabIndex = 6;
@@ -86,29 +58,57 @@
             buttonGet.UseVisualStyleBackColor = true;
             buttonGet.Click += buttonGet_Click;
             // 
+            // dataGridView1
+            // 
+            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView1.Location = new Point(12, 12);
+            dataGridView1.Name = "dataGridView1";
+            dataGridView1.RowTemplate.Height = 25;
+            dataGridView1.ScrollBars = ScrollBars.Vertical;
+            dataGridView1.Size = new Size(656, 414);
+            dataGridView1.TabIndex = 12;
+            dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(707, 164);
+            label1.Name = "label1";
+            label1.Size = new Size(38, 15);
+            label1.TabIndex = 13;
+            label1.Text = "label1";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(707, 206);
+            label2.Name = "label2";
+            label2.Size = new Size(38, 15);
+            label2.TabIndex = 14;
+            label2.Text = "label2";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(422, 293);
+            ClientSize = new Size(792, 453);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Controls.Add(dataGridView1);
             Controls.Add(buttonGet);
             Controls.Add(buttonSet);
-            Controls.Add(cell_4);
-            Controls.Add(cell_3);
-            Controls.Add(cell_2);
-            Controls.Add(cell_1);
             Name = "Form1";
             Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-        private TextBox cell_1;
-        private TextBox cell_2;
-        private TextBox cell_3;
-        private TextBox cell_4;
         private Button buttonSet;
         private Button buttonGet;
+        private DataGridView dataGridView1;
+        private Label label1;
+        private Label label2;
     }
 }

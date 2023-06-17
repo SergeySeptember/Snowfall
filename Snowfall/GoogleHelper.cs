@@ -84,10 +84,10 @@ namespace Snowfall
             return false;
         }
 
-        internal void Set(string cellName, string value)
+        internal void Set(string cellName1, string cellName2, string value1, string value2)
         {
-            var range = this.sheetName + "!" + cellName + ":" + cellName;
-            var values = new List<List<object>> { new List<object> { value } };
+            var range = this.sheetName + "!" + cellName1 + ":" + cellName2;
+            var values = new List<List<object>> { new List<object> { value1, value2 } };
 
             var request = this.sheetService.Spreadsheets.Values.Update(
                 new ValueRange { Values = new List<IList<object>>(values) },
@@ -98,9 +98,9 @@ namespace Snowfall
             var response = request.Execute();
         }
 
-        internal string Get(string cellName)
+        internal List<List<string>> Get(string cellName, string cellName2)
         {
-            var range = this.sheetName + "!" + cellName + ":" + cellName;
+            var range = this.sheetName + "!" + cellName + ":" + cellName2;
 
             var request = this.sheetService.Spreadsheets.Values.Get(
                 spreadsheetId: this.sheetFileId,
@@ -108,7 +108,21 @@ namespace Snowfall
                 );
             var response = request.Execute();
 
-            return response.Values?.First()?.First()?.ToString();
+            List<List<string>> valuesList = new List<List<string>>();
+
+            foreach (var row in response.Values)
+            {
+                List<string> rowValues = new List<string>();
+
+                foreach (var cell in row)
+                {
+                    rowValues.Add(cell.ToString());
+                }
+
+                valuesList.Add(rowValues);
+            }
+
+            return valuesList;
         }
     }
 
