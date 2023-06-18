@@ -84,21 +84,25 @@ namespace Snowfall
             return false;
         }
 
-        internal void Set(string cellName1, string cellName2, string value1, string value2)
+        internal void Set(string cellName1, string cellName2, string value1, string value2, string value3, string value4)
         {
-            var range = this.sheetName + "!" + cellName1 + ":" + cellName2;
-            var values = new List<List<object>> { new List<object> { value1, value2 } };
+            if (!string.IsNullOrEmpty(value1))
+            {
+                var range = this.sheetName + "!" + cellName1 + ":" + cellName2;
+                var values = new List<List<object>> { new List<object> { value1, value2, value3, value4 } };
 
-            var request = this.sheetService.Spreadsheets.Values.Update(
-                new ValueRange { Values = new List<IList<object>>(values) },
-                spreadsheetId: this.sheetFileId,
-                range: range
-                );
-            request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-            var response = request.Execute();
+                var request = this.sheetService.Spreadsheets.Values.Update(
+                    new ValueRange { Values = new List<IList<object>>(values) },
+                    spreadsheetId: this.sheetFileId,
+                    range: range
+                    );
+                request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                var response = request.Execute();
+            }
+            
         }
 
-        internal List<List<string>> Get(string cellName, string cellName2)
+        public TaskBody Get(string cellName, string cellName2)
         {
             var range = this.sheetName + "!" + cellName + ":" + cellName2;
 
@@ -108,23 +112,59 @@ namespace Snowfall
                 );
             var response = request.Execute();
 
-            List<List<string>> valuesList = new List<List<string>>();
+            TaskBody taskBody = new TaskBody();
 
-            foreach (var row in response.Values)
+            if (response.Values.Count > 0 && response.Values[0].Count > 0)
             {
-                List<string> rowValues = new List<string>();
+                taskBody.Task = response.Values[0][0].ToString();
 
-                foreach (var cell in row)
+                if (response.Values[0].Count > 1 && response.Values[0][1] != null)
                 {
-                    rowValues.Add(cell.ToString());
+                    taskBody.Status = Convert.ToBoolean(response.Values[0][1]);
+                }
+                else
+                {
+                    taskBody.Status = false;
                 }
 
-                valuesList.Add(rowValues);
+                if (response.Values[0].Count > 2 && response.Values[0][2] != null)
+                {
+                    taskBody.Category = response.Values[0][2].ToString();
+                }
+                else
+                {
+                    taskBody.Category = "";
+                }
+
+                if (response.Values[0].Count > 3 && response.Values[0][3] != null)
+                {
+                    taskBody.Time = response.Values[0][3].ToString();
+                }
+                else
+                {
+                    taskBody.Time = "";
+                }
             }
 
-            return valuesList;
+            return taskBody;
+        }
+
+        public int GetCountOfRaws(string cellName, string cellName2)
+        {
+            var range = this.sheetName + "!" + cellName + ":" + cellName2;
+
+            var request = this.sheetService.Spreadsheets.Values.Get(
+                spreadsheetId: this.sheetFileId,
+                range: range
+                );
+            var response = request.Execute();
+
+            if (response.Values is null)
+            {
+                return 0;
+            }
+            
+            return response.Values.Count;
         }
     }
-
 }
-

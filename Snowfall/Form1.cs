@@ -24,13 +24,18 @@ namespace Snowfall
         public Form1()
         {
             InitializeComponent();
+        }
 
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
             StartConnect();
 
             dataGridView1.DataBindings.Add("DataSource", this, nameof(TaskBodyProperty));
             TaskBodyProperty = new BindingList<TaskBody>();
 
             InitialLoadTask();
+            ColumnsConfig();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -43,61 +48,49 @@ namespace Snowfall
             this.helper = new GoogleHelper(token[0], todoSheet);
 
             bool success = this.helper.Start().Result;
-
-            if (success == true)
-            {
-                buttonGet.Enabled = true;
-                buttonSet.Enabled = true;
-            }
         }
 
-        private void buttonSet_Click(object sender, EventArgs e)
+        private void ColumnsConfig()
         {
-            int lineNumber = NumberOfRaws();
-            var taskBody = TaskBodyProperty.Last();
-
-            this.helper.Set(cellName1: $"A{lineNumber}", cellName2: $"B{lineNumber}", taskBody.Task, taskBody.Status.ToString());
+            dataGridView1.Columns[0].Width = 300;
         }
 
-        private void buttonGet_Click(object sender, EventArgs e)
+        private int ExcelNemberOfRaws()
         {
-            var taskBody = TaskBodyProperty.Last();
-            label1.Text = dataGridView1.CurrentCell.RowIndex.ToString();
-            label2.Text = taskBody.Task;
-        }
-
-        private int NumberOfRaws()
-        {
-            return TaskBodyProperty.Count;
+            int countOfRaw = this.helper.GetCountOfRaws(cellName: "A", cellName2: "A");
+            return countOfRaw;
         }
 
         private void InitialLoadTask()
         {
-            List<List<string>> allRaw = this.helper.Get(cellName: "A", cellName2: "A");
-            int countOfRaw = allRaw.Count;
-
-            for (int i = 1; i <= countOfRaw; i++)
+            int countOfRaw = ExcelNemberOfRaws();
+            if (countOfRaw != 0)
             {
-                List<List<string>> result = this.helper.Get(cellName: $"A{i}", cellName2: $"B{i}");
-                bool checkBox = false;
-
-                if (result[0][1] == "True")
+                for (int i = 1; i <= countOfRaw; i++)
                 {
-                    checkBox = true;
+                    TaskBody result = this.helper.Get(cellName: $"A{i}", cellName2: $"D{i}");
+                    TaskBodyProperty.Add(result);
                 }
-
-                TaskBodyProperty.Add(new TaskBody { Task = result[0][0], Status = checkBox });
 
             }
         }
 
-
-        private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             int lineNumber = dataGridView1.CurrentCell.RowIndex + 1;
             var taskBody = TaskBodyProperty[lineNumber - 1];
 
-            this.helper.Set(cellName1: $"A{lineNumber}", cellName2: $"B{lineNumber}", taskBody.Task, taskBody.Status.ToString());
+            this.helper.Set(cellName1: $"A{lineNumber}", cellName2: $"D{lineNumber}", taskBody.Task, taskBody.Status.ToString(), taskBody.Category, taskBody.Time);
+        }
+
+        private void buttonSet_Click(object sender, EventArgs e)
+        {
+            //
+        }
+
+        private void buttonGet_Click(object sender, EventArgs e)
+        {
+            //
         }
 
     }

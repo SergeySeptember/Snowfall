@@ -31,8 +31,6 @@
             buttonSet = new Button();
             buttonGet = new Button();
             dataGridView1 = new DataGridView();
-            label1 = new Label();
-            label2 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -62,53 +60,34 @@
             // 
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView1.Location = new Point(12, 12);
+            dataGridView1.MultiSelect = false;
             dataGridView1.Name = "dataGridView1";
+            dataGridView1.RowHeadersVisible = false;
             dataGridView1.RowTemplate.Height = 25;
             dataGridView1.ScrollBars = ScrollBars.Vertical;
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.CellSelect;
             dataGridView1.Size = new Size(656, 414);
             dataGridView1.TabIndex = 12;
-            dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(707, 164);
-            label1.Name = "label1";
-            label1.Size = new Size(38, 15);
-            label1.TabIndex = 13;
-            label1.Text = "label1";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(707, 206);
-            label2.Name = "label2";
-            label2.Size = new Size(38, 15);
-            label2.TabIndex = 14;
-            label2.Text = "label2";
+            dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(792, 453);
-            Controls.Add(label2);
-            Controls.Add(label1);
             Controls.Add(dataGridView1);
             Controls.Add(buttonGet);
             Controls.Add(buttonSet);
             Name = "Form1";
             Text = "Form1";
+            Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
         private Button buttonSet;
         private Button buttonGet;
         private DataGridView dataGridView1;
-        private Label label1;
-        private Label label2;
     }
 }
