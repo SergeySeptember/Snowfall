@@ -1,18 +1,24 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Snowfall
 {
     public partial class Form1 : Form, INotifyPropertyChanged
     {
         private GoogleHelper _helper;
-        string[] token = File.ReadAllLines(@"C:\Users\September\Desktop\credentials.json");
+        string[] token = File.ReadAllLines(@"C:\Users\September\source\repos\Snowfall\Documents\token.json");
         string todoSheet = "Example";
         BindingList<TaskBody> listOfTusks = new BindingList<TaskBody>();
         string path = $"{Environment.CurrentDirectory}\\ListOfTasks.json";
         private FileIOService _fileIOService;
         bool successConnect;
         private BindingList<TaskBody> _taskBody;
+
+        //New
+        private Button currentButton;
+        private int tempIndex;
+        private Form activeForm;
 
         public BindingList<TaskBody> TaskBodyProperty
         {
@@ -27,6 +33,8 @@ namespace Snowfall
         public Form1()
         {
             InitializeComponent();
+
+            this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea; //Что это?
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -36,6 +44,92 @@ namespace Snowfall
 
             StartConnect();
         }
+
+        //New methods
+        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
+        private extern static void ReleaseCapture();
+        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
+        private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
+
+        private Color SelectThemeColor()
+        {
+            string color = ThemeColor.ColorList[1];
+            return ColorTranslator.FromHtml(color);
+        }
+
+        private void ActivateButton(object btnSender)
+        {
+            if (btnSender != null)
+            {
+                if (currentButton != (Button)btnSender)
+                {
+                    DisableButton();
+                    Color color = SelectThemeColor();
+                    currentButton = (Button)btnSender;
+                    currentButton.BackColor = color;
+                    currentButton.ForeColor = Color.White;
+                    currentButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                }
+            }
+        }
+
+        private void DisableButton()
+        {
+            foreach (Control previousBtn in panelMenu.Controls)
+            {
+                if (previousBtn.GetType() == typeof(Button))
+                {
+                    previousBtn.BackColor = Color.FromArgb(51, 51, 76);
+                    previousBtn.ForeColor = Color.Gainsboro;
+                    previousBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                }
+            }
+        }
+
+        private void OpenChildForm(Form childForm, object btnSender)
+        {
+            if (activeForm != null)
+            {
+                activeForm.Close();
+            }
+
+            ActivateButton(btnSender);
+            activeForm = childForm;
+            childForm.TopLevel = false;
+            childForm.FormBorderStyle = FormBorderStyle.None;
+            childForm.Dock = DockStyle.Fill;
+            this.panelDesktop.Controls.Add(childForm);
+            this.panelDesktop.Tag = childForm;
+            childForm.BringToFront();
+            childForm.Show();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (activeForm != null)
+                activeForm.Close();
+            Reset();
+            ActivateButton(sender);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new Forms.FormNotes(), sender);
+        }
+        private void button3_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new Forms.FormSettings(), sender);
+        }
+
+        private void Reset()
+        {
+            DisableButton();
+            panelTitleBar.BackColor = Color.FromArgb(0, 150, 136);
+            panelLogo.BackColor = Color.FromArgb(39, 39, 58);
+            currentButton = null;
+        }
+
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -67,7 +161,10 @@ namespace Snowfall
 
         private void ColumnsConfig()
         {
-            dataGridView1.Columns[0].Width = 100;
+            dataGridView1.Columns[0].Width = 457;
+            dataGridView1.Columns[1].Width = 50;
+            dataGridView1.Columns[2].Width = 100;
+            dataGridView1.Columns[3].Width = 160;
         }
 
         private void LoadDataFromGDrive()
@@ -144,5 +241,15 @@ namespace Snowfall
                 WriteDataToGoogle();
         }
 
+        private void panelTitleBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            ReleaseCapture();
+            SendMessage(this.Handle, 0x112, 0xf012, 0);
+        }
+
+        private void buttonClose_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }
