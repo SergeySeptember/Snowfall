@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel;
 
-namespace Snowfall
+namespace Snowfall.Service
 {
     public class FileIOService
     {
@@ -14,7 +14,7 @@ namespace Snowfall
                 File.CreateText(path).Dispose();
                 return new BindingList<TaskBody>
                 {
-                    
+
                 };
             }
             using (var reader = File.OpenText(path))

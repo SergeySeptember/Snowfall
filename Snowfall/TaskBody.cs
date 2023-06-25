@@ -14,6 +14,7 @@ namespace Snowfall
         private bool _status;
         private string _category;
         private string _time = DateTime.Now.ToString();
+        private string _timeUpdate = DateTime.Now.ToString();
 
         [DisplayName("Task")]
         public string Task
@@ -36,7 +37,7 @@ namespace Snowfall
                 OnPropertyChanged();
             }
         }
-        [Browsable(true)]
+        
         public string Category
         {
             get => _category;
@@ -47,13 +48,23 @@ namespace Snowfall
             }
         }
 
-        [Browsable(true)]
         public string Time
         {
             get => _time;
             set
             {
                 _time = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [Browsable(false)]
+        public string TimeUpdate
+        {
+            get => _timeUpdate;
+            set
+            {
+                _timeUpdate = value;
                 OnPropertyChanged();
             }
         }

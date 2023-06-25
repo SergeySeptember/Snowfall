@@ -84,12 +84,12 @@ namespace Snowfall
             return false;
         }
 
-        internal void Set(string cellName1, string cellName2, string value1, string value2, string value3, string value4)
+        internal void Set(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5)
         {
             if (!string.IsNullOrEmpty(value1))
             {
                 var range = this.sheetName + "!" + cellName1 + ":" + cellName2;
-                var values = new List<List<object>> { new List<object> { value1, value2, value3, value4 } };
+                var values = new List<List<object>> { new List<object> { value1, value2, value3, value4, value5 } };
 
                 var request = this.sheetService.Spreadsheets.Values.Update(
                     new ValueRange { Values = new List<IList<object>>(values) },
@@ -144,8 +144,16 @@ namespace Snowfall
                 {
                     taskBody.Time = "";
                 }
-            }
 
+                if (response.Values[0].Count > 4 && response.Values[0][4] != null)
+                {
+                    taskBody.TimeUpdate = response.Values[0][4].ToString();
+                }
+                else
+                {
+                    taskBody.TimeUpdate = null;
+                }
+            }
             return taskBody;
         }
 
