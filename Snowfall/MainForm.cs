@@ -1,5 +1,4 @@
 using Snowfall.Service;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -10,9 +9,10 @@ namespace Snowfall
     {
         private GoogleHelper _helper;
         private string[] token = File.ReadAllLines(@"C:\Users\September\source\repos\Snowfall\Documents\token.json");
-        private string todoSheet = "Example";
-        private string path = $"{Environment.CurrentDirectory}\\ListOfTasks.json";
-        private bool successConnect;
+        private string todoSheet = "Snowfall";
+        private string pathOfTasks = $"{Environment.CurrentDirectory}\\ListOfTasks.json";
+        private string pathOfSettings = $"{Environment.CurrentDirectory}\\settings.txt";
+        private bool successConnect = true;
         private BindingList<TaskBody> _taskBody;
         private Button currentButton;
         private Form activeForm;
@@ -49,7 +49,7 @@ namespace Snowfall
 
             try
             {
-                successConnect = this._helper.Start().Result;
+                this._helper.Start();
             }
             catch (Exception)
             {
@@ -57,13 +57,9 @@ namespace Snowfall
             }
 
             if (successConnect == true)
-            {
                 LoadAndSortData();
-            }
             else
-            {
                 LoadDataFromJson();
-            }
         }
 
         private void LoadDataFromGDrive()
@@ -71,11 +67,7 @@ namespace Snowfall
             int countOfRawOnGDrive = this._helper.GetCountOfRaws(cellName: "A", cellName2: "A");
             if (countOfRawOnGDrive != 0)
             {
-                for (int i = 1; i <= countOfRawOnGDrive; i++)
-                {
-                    TaskBody result = this._helper.Get(cellName: $"A{i}", cellName2: $"E{i}");
-                    listOfTusksGDrive.Add(result);
-                }
+                listOfTusksGDrive = this._helper.Get(cellName: $"A{1}", cellName2: $"E{countOfRawOnGDrive}");
             }
         }
 
@@ -117,7 +109,7 @@ namespace Snowfall
 
         private void LoadDataFromJson()
         {
-            listOfTusksJSON = FileIOService.LoadData(path);
+            listOfTusksJSON = FileIOService.LoadData(pathOfTasks);
         }
 
         private void EditRawOfTask(int index, TaskBody currentTaskBody)
@@ -140,7 +132,7 @@ namespace Snowfall
         {
             int index = dataGridView1.CurrentCell.RowIndex;
 
-            if (!string.IsNullOrWhiteSpace(listOfTusks[index].Task))
+            if (listOfTusks.Count > index && !string.IsNullOrWhiteSpace(listOfTusks[index].Task))
             {
                 var currentTaskBody = listOfTusks[index];
 
@@ -154,7 +146,15 @@ namespace Snowfall
                     this._helper.Set(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", taskBody.Task, taskBody.Status.ToString(), taskBody.Category, taskBody.Time, taskBody.TimeUpdate = DateTime.Now.ToString());
                 }
 
-                await Task.Run(() => FileIOService.SaveData(listOfTusks, path));
+                for (int i = listOfTusks.Count - 1; i >= 0; i--)
+                {
+                    if (string.IsNullOrWhiteSpace(listOfTusks[i].Task))
+                    {
+                        listOfTusks.RemoveAt(i);
+                    }
+                }
+
+                await Task.Run(() => FileIOService.SaveData(listOfTusks, pathOfTasks));
             }
         }
 
@@ -166,8 +166,13 @@ namespace Snowfall
                 LoadDataFromGDrive();
                 listOfTusks.Clear();
                 listOfTusks = listOfTusksGDrive;
-                await Task.Run(() => FileIOService.SaveData(listOfTusks, path));
+                await Task.Run(() => FileIOService.SaveData(listOfTusks, pathOfTasks));
             }
+        }
+
+        private void OrderByCategory()
+        {
+            //listOfTusks = listOfTusks.Where(b => !string.IsNullOrWhiteSpace(b.Task)).ToList();
         }
 
         # region [Theme]
@@ -295,7 +300,15 @@ namespace Snowfall
 
         private void buttonTest_Click(object sender, EventArgs e)
         {
-            RefreshListAsync();
+            this._helper.DeleteRow(10);
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F5)
+            {
+                RefreshListAsync();
+            }
         }
     }
 }
