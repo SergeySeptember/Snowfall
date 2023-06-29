@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel;
-using static System.Net.Mime.MediaTypeNames;
-using System.IO;
 
 namespace Snowfall.Service
 {
@@ -35,29 +33,5 @@ namespace Snowfall.Service
 
         }
 
-        public static bool LoadSettings(string pathOfSettings)
-        {
-         var fileExists = File.Exists(pathOfSettings);
-            if (!fileExists)
-            {    
-                using (StreamWriter writer = new StreamWriter(pathOfSettings, false))
-                {
-                    writer.WriteLine("first run = true");
-                    writer.WriteLine("past internet connect = false");
-                }
-                return false;
-            }
-            using (var reader = File.OpenText(pathOfSettings))
-            {
-                var fileText = reader.ReadToEnd();
-                return false;
-            }
-        }
-
-        public static void SaveSettings(string pathOfSettings)
-        {
-
-
-        }
     }
 }

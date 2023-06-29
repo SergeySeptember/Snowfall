@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Snowfall
 {
-    public class TaskBody : INotifyPropertyChanged
+    public class TaskBody
     {
         private string _task;
         private bool _status;
@@ -16,25 +16,21 @@ namespace Snowfall
         private string _time = DateTime.Now.ToString();
         private string _timeUpdate = DateTime.Now.ToString();
 
-        [DisplayName("Task")]
         public string Task
         {
             get => _task;
             set
             {
                 _task = value;
-                OnPropertyChanged();
             }
         }
 
-        [DisplayName("Status")]
         public bool Status
         {
             get => _status;
             set
             {
                 _status = value;
-                OnPropertyChanged();
             }
         }
         
@@ -44,7 +40,6 @@ namespace Snowfall
             set
             {
                 _category = value;
-                OnPropertyChanged();
             }
         }
 
@@ -54,7 +49,6 @@ namespace Snowfall
             set
             {
                 _time = value;
-                OnPropertyChanged();
             }
         }
 
@@ -65,12 +59,7 @@ namespace Snowfall
             set
             {
                 _timeUpdate = value;
-                OnPropertyChanged();
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
