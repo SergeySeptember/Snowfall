@@ -28,7 +28,7 @@ namespace Snowfall
             this.sheetFileName = sheetFileName;
         }
 
-        public async void Start()
+        internal async Task<bool> Start()
         {
             string credentialPath = Path.Combine(
                 Environment.CurrentDirectory,
@@ -104,6 +104,7 @@ namespace Snowfall
 
                 this.sheetName = sheetResponse.Sheets[0].Properties.Title;
             }
+            return true;
         }
 
         internal void Set(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5)
@@ -180,8 +181,8 @@ namespace Snowfall
                     {
                         SheetId = 1,
                         Dimension = "ROWS",
-                        StartIndex = rowIndex - 1,
-                        EndIndex = rowIndex
+                        StartIndex = rowIndex,
+                        EndIndex = rowIndex + 1
                     }
                 }
             };

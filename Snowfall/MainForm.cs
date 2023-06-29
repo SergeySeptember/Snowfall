@@ -17,9 +17,9 @@ namespace Snowfall
         private Button currentButton;
         private Form activeForm;
 
-        private BindingList<TaskBody> listOfTusksGDrive = new BindingList<TaskBody>();
-        private BindingList<TaskBody> listOfTusksJSON = new BindingList<TaskBody>();
-        public BindingList<TaskBody> listOfTusks
+        private BindingList<TaskBody> listOfTasksGDrive = new BindingList<TaskBody>();
+        private BindingList<TaskBody> listOfTasksJSON = new BindingList<TaskBody>();
+        public BindingList<TaskBody> listOfTasks
         {
             get => _taskBody;
             set
@@ -36,8 +36,8 @@ namespace Snowfall
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            dataGridView1.DataBindings.Add("DataSource", this, nameof(listOfTusks));
-            listOfTusks = new BindingList<TaskBody>();
+            dataGridView1.DataBindings.Add("DataSource", this, nameof(listOfTasks));
+            listOfTasks = new BindingList<TaskBody>();
 
             InitialLoad();
             ColumnsConfig();
@@ -49,7 +49,7 @@ namespace Snowfall
 
             try
             {
-                this._helper.Start();
+                successConnect = this._helper.Start().Result;
             }
             catch (Exception)
             {
@@ -67,7 +67,7 @@ namespace Snowfall
             int countOfRawOnGDrive = this._helper.GetCountOfRaws(cellName: "A", cellName2: "A");
             if (countOfRawOnGDrive != 0)
             {
-                listOfTusksGDrive = this._helper.Get(cellName: $"A{1}", cellName2: $"E{countOfRawOnGDrive}");
+                listOfTasksGDrive = this._helper.Get(cellName: $"A{1}", cellName2: $"E{countOfRawOnGDrive}");
             }
         }
 
@@ -76,55 +76,55 @@ namespace Snowfall
             LoadDataFromGDrive();
             LoadDataFromJson();
 
-            int countOfRawGDrive = listOfTusksGDrive.Count;
-            int countOfRawJson = listOfTusksJSON.Count;
+            int countOfRawGDrive = listOfTasksGDrive.Count;
+            int countOfRawJson = listOfTasksJSON.Count;
 
             int minCount = Math.Min(countOfRawJson, countOfRawGDrive);
 
             for (int i = 0; i < minCount; i++)
             {
-                var time1 = DateTime.Parse(listOfTusksJSON[i].TimeUpdate);
-                var time2 = DateTime.Parse(listOfTusksGDrive[i].TimeUpdate);
+                var time1 = DateTime.Parse(listOfTasksJSON[i].TimeUpdate);
+                var time2 = DateTime.Parse(listOfTasksGDrive[i].TimeUpdate);
 
                 if (time1 > time2)
                 {
-                    listOfTusks.Add(listOfTusksJSON[i]);
+                    listOfTasks.Add(listOfTasksJSON[i]);
                 }
                 else
                 {
-                    listOfTusks.Add(listOfTusksGDrive[i]);
+                    listOfTasks.Add(listOfTasksGDrive[i]);
                 }
             }
 
             for (int i = minCount; i < countOfRawJson; i++)
             {
-                listOfTusks.Add(listOfTusksJSON[i]);
+                listOfTasks.Add(listOfTasksJSON[i]);
             }
 
             for (int i = minCount; i < countOfRawGDrive; i++)
             {
-                listOfTusks.Add(listOfTusksGDrive[i]);
+                listOfTasks.Add(listOfTasksGDrive[i]);
             }
         }
 
         private void LoadDataFromJson()
         {
-            listOfTusksJSON = FileIOService.LoadData(pathOfTasks);
+            listOfTasksJSON = FileIOService.LoadData(pathOfTasks);
         }
 
-        private void EditRawOfTask(int index, TaskBody currentTaskBody)
+        private void EditTask(int index, TaskBody currentTaskBody)
         {
-            if (listOfTusks.Count < index)
+            if (listOfTasks.Count < index)
             {
-                listOfTusks.Add(currentTaskBody);
+                listOfTasks.Add(currentTaskBody);
             }
             else
             {
-                listOfTusks[index].Task = currentTaskBody.Task;
-                listOfTusks[index].Status = currentTaskBody.Status;
-                listOfTusks[index].Category = currentTaskBody.Category;
-                listOfTusks[index].Time = currentTaskBody.Time;
-                listOfTusks[index].TimeUpdate = DateTime.Now.ToString();
+                listOfTasks[index].Task = currentTaskBody.Task;
+                listOfTasks[index].Status = currentTaskBody.Status;
+                listOfTasks[index].Category = currentTaskBody.Category;
+                listOfTasks[index].Time = currentTaskBody.Time;
+                listOfTasks[index].TimeUpdate = DateTime.Now.ToString();
             }
         }
 
@@ -132,29 +132,29 @@ namespace Snowfall
         {
             int index = dataGridView1.CurrentCell.RowIndex;
 
-            if (listOfTusks.Count > index && !string.IsNullOrWhiteSpace(listOfTusks[index].Task))
+            if (listOfTasks.Count > index && !string.IsNullOrWhiteSpace(listOfTasks[index].Task))
             {
-                var currentTaskBody = listOfTusks[index];
+                var currentTaskBody = listOfTasks[index];
 
-                EditRawOfTask(index, currentTaskBody);
+                EditTask(index, currentTaskBody);
 
                 if (successConnect == true)
                 {
                     int lineNumber = dataGridView1.CurrentCell.RowIndex + 1;
-                    var taskBody = listOfTusks[index];
+                    var taskBody = listOfTasks[index];
 
                     this._helper.Set(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", taskBody.Task, taskBody.Status.ToString(), taskBody.Category, taskBody.Time, taskBody.TimeUpdate = DateTime.Now.ToString());
                 }
 
-                for (int i = listOfTusks.Count - 1; i >= 0; i--)
+                for (int i = listOfTasks.Count - 1; i >= 0; i--)
                 {
-                    if (string.IsNullOrWhiteSpace(listOfTusks[i].Task))
+                    if (string.IsNullOrWhiteSpace(listOfTasks[i].Task))
                     {
-                        listOfTusks.RemoveAt(i);
+                        listOfTasks.RemoveAt(i);
                     }
                 }
 
-                await Task.Run(() => FileIOService.SaveData(listOfTusks, pathOfTasks));
+                FileIOService.SaveData(listOfTasks, pathOfTasks);
             }
         }
 
@@ -162,17 +162,21 @@ namespace Snowfall
         {
             if (successConnect == true)
             {
-                listOfTusksGDrive.Clear();
+                listOfTasksGDrive.Clear();
                 LoadDataFromGDrive();
-                listOfTusks.Clear();
-                listOfTusks = listOfTusksGDrive;
-                await Task.Run(() => FileIOService.SaveData(listOfTusks, pathOfTasks));
+                listOfTasks.Clear();
+                listOfTasks = listOfTasksGDrive;
+                await Task.Run(() => FileIOService.SaveData(listOfTasks, pathOfTasks));
             }
         }
 
         private void OrderByCategory()
         {
-            //listOfTusks = listOfTusks.Where(b => !string.IsNullOrWhiteSpace(b.Task)).ToList();
+            string category = "Project";
+            List<TaskBody> categories = new List<TaskBody>();
+            categories = listOfTasks.Where(b => b.Category == category).ToList();
+            
+
         }
 
         # region [Theme]
@@ -293,14 +297,28 @@ namespace Snowfall
             Application.Exit();
         }
 
-        //Events
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         private void buttonTest_Click(object sender, EventArgs e)
         {
-            this._helper.DeleteRow(10);
+            OrderByCategory();
+
+            
+
+            string searchTask = "Собрать вещи";
+            int index = -1;
+
+            for (int i = 0; i < listOfTasks.Count; i++)
+            {
+                if (listOfTasks[i].Task == searchTask)
+                {
+                    index = i;
+                    break;
+                }
+            }
+
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -309,6 +327,37 @@ namespace Snowfall
             {
                 RefreshListAsync();
             }
+        }
+
+        private void dataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.ColumnIndex != -1 && e.RowIndex != -1 && e.Button == MouseButtons.Right)
+            {
+                if (e.RowIndex >= 0)
+                {
+                    DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+
+                    if (!row.Selected)
+                    {
+                        dataGridView1.ClearSelection();
+
+                        foreach (DataGridViewCell cell in row.Cells)
+                        {
+                            cell.Selected = true;
+                        }
+
+                        Point cursorPosition = dataGridView1.PointToClient(Control.MousePosition);
+                        contextMenu.Show(dataGridView1, cursorPosition);
+                    }
+                }
+            }
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int index = dataGridView1.CurrentCell.RowIndex;
+            listOfTasks.RemoveAt(index);
+            this._helper.DeleteRow(index);
         }
     }
 }
