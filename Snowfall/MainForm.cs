@@ -1,33 +1,22 @@
 using Snowfall.Service;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Snowfall
 {
-    public partial class MainForm : Form, INotifyPropertyChanged
+    public partial class MainForm : Form
     {
-        private GoogleHelper _helper;
+        private GoogleHelper googleHelper;
         private string[] token = File.ReadAllLines(@"C:\Users\September\source\repos\Snowfall\Documents\token.json");
         private string todoSheet = "Snowfall";
         private string pathOfTasks = $"{Environment.CurrentDirectory}\\ListOfTasks.json";
-        private string pathOfSettings = $"{Environment.CurrentDirectory}\\settings.txt";
         private bool successConnect = true;
-        private BindingList<TaskBody> _taskBody;
         private Button currentButton;
         private Form activeForm;
 
         private BindingList<TaskBody> listOfTasksGDrive = new BindingList<TaskBody>();
         private BindingList<TaskBody> listOfTasksJSON = new BindingList<TaskBody>();
-        public BindingList<TaskBody> listOfTasks
-        {
-            get => _taskBody;
-            set
-            {
-                _taskBody = value;
-                OnPropertyChanged();
-            }
-        }
+        private BindingList<TaskBody> listOfTasks = new BindingList<TaskBody>();
 
         public MainForm()
         {
@@ -36,20 +25,20 @@ namespace Snowfall
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            dataGridView1.DataBindings.Add("DataSource", this, nameof(listOfTasks));
-            listOfTasks = new BindingList<TaskBody>();
-
             InitialLoad();
+
+            dataGridView1.DataSource = listOfTasks;
+
             ColumnsConfig();
         }
 
         private void InitialLoad()
         {
-            this._helper = new GoogleHelper(token[0], todoSheet);
+            googleHelper = new GoogleHelper(token[0], todoSheet);
 
             try
             {
-                successConnect = this._helper.Start().Result;
+                successConnect = this.googleHelper.Start().Result;
             }
             catch (Exception)
             {
@@ -64,10 +53,10 @@ namespace Snowfall
 
         private void LoadDataFromGDrive()
         {
-            int countOfRawOnGDrive = this._helper.GetCountOfRaws(cellName: "A", cellName2: "A");
+            int countOfRawOnGDrive = googleHelper.GetCountOfRaws(cellName: "A", cellName2: "A");
             if (countOfRawOnGDrive != 0)
             {
-                listOfTasksGDrive = this._helper.Get(cellName: $"A{1}", cellName2: $"E{countOfRawOnGDrive}");
+                listOfTasksGDrive = googleHelper.Get(cellName: $"A{1}", cellName2: $"E{countOfRawOnGDrive}");
             }
         }
 
@@ -143,7 +132,7 @@ namespace Snowfall
                     int lineNumber = dataGridView1.CurrentCell.RowIndex + 1;
                     var taskBody = listOfTasks[index];
 
-                    this._helper.Set(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", taskBody.Task, taskBody.Status.ToString(), taskBody.Category, taskBody.Time, taskBody.TimeUpdate = DateTime.Now.ToString());
+                    googleHelper.Set(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", taskBody.Task, taskBody.Status.ToString(), taskBody.Category, taskBody.Time, taskBody.TimeUpdate = DateTime.Now.ToString());
                 }
 
                 for (int i = listOfTasks.Count - 1; i >= 0; i--)
@@ -297,11 +286,7 @@ namespace Snowfall
             Application.Exit();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        private void buttonTest_Click(object sender, EventArgs e)
+        private void ButtonTest_Click(object sender, EventArgs e)
         {
             OrderByCategory();
 
@@ -329,7 +314,7 @@ namespace Snowfall
             }
         }
 
-        private void dataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        private void DataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.ColumnIndex != -1 && e.RowIndex != -1 && e.Button == MouseButtons.Right)
             {
@@ -353,11 +338,11 @@ namespace Snowfall
             }
         }
 
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int index = dataGridView1.CurrentCell.RowIndex;
             listOfTasks.RemoveAt(index);
-            this._helper.DeleteRow(index);
+            this.googleHelper.DeleteRow(index);
         }
     }
 }

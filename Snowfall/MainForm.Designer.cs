@@ -80,7 +80,7 @@
             buttonTest.TabIndex = 4;
             buttonTest.Text = "Test";
             buttonTest.UseVisualStyleBackColor = true;
-            buttonTest.Click += buttonTest_Click;
+            buttonTest.Click += ButtonTest_Click;
             // 
             // buttonSettings
             // 
@@ -226,7 +226,7 @@
             dataGridView1.Size = new Size(767, 511);
             dataGridView1.TabIndex = 12;
             dataGridView1.CellEndEdit += SaveCellEditAsync;
-            dataGridView1.CellMouseDown += dataGridView1_CellMouseDown;
+            dataGridView1.CellMouseDown += DataGridView1_CellMouseDown;
             // 
             // contextMenu
             // 
@@ -239,7 +239,7 @@
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             deleteToolStripMenuItem.Size = new Size(180, 22);
             deleteToolStripMenuItem.Text = "Delete";
-            deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
+            deleteToolStripMenuItem.Click += DeleteToolStripMenuItem_Click;
             // 
             // MainForm
             // 
