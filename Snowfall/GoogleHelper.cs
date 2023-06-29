@@ -3,7 +3,7 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Util.Store;
-using Newtonsoft.Json.Linq;
+using System.ComponentModel;
 using System.Text;
 
 namespace Snowfall
@@ -20,9 +20,7 @@ namespace Snowfall
 
         public string ApplicationName { get; private set; } = "Snowfall";
 
-        public string[] Scopes { get; private set; } = new string[] {
-            DriveService.Scope.Drive,
-        SheetsService.Scope.Spreadsheets};
+        public string[] Scopes { get; private set; } = new string[] { DriveService.Scope.Drive, SheetsService.Scope.Spreadsheets };
 
         public GoogleHelper(string token, string sheetFileName)
         {
@@ -71,25 +69,50 @@ namespace Snowfall
                 }
             }
 
+            if (this.sheetFileId == null)
+            {
+                var spreadsheet_body = new Spreadsheet();
+                spreadsheet_body.Properties = new SpreadsheetProperties();
+                spreadsheet_body.Properties.Title = "Snowfall";
+                spreadsheet_body.Sheets = new List<Sheet>();
+
+                var sheetTasks = new Sheet();
+                sheetTasks.Properties = new SheetProperties();
+                sheetTasks.Properties.Title = "Tasks";
+                sheetTasks.Properties.SheetId = 1;
+                sheetTasks.Properties.SheetType = "GRID";
+
+                var sheetNotes = new Sheet();
+                sheetNotes.Properties = new SheetProperties();
+                sheetNotes.Properties.Title = "Notes";
+                sheetNotes.Properties.SheetId = 2;
+                sheetNotes.Properties.SheetType = "GRID";
+
+                spreadsheet_body.Sheets.Add(sheetTasks);
+                spreadsheet_body.Sheets.Add(sheetNotes);
+
+                var create_request = sheetService.Spreadsheets.Create(spreadsheet_body);
+                var spreadsheet = create_request.Execute();
+
+                this.sheetFileId = spreadsheet.SpreadsheetId;
+            }
+
             if (!string.IsNullOrEmpty(this.sheetFileId))
             {
                 var sheetRequest = this.sheetService.Spreadsheets.Get(this.sheetFileId);
                 var sheetResponse = sheetRequest.Execute();
 
                 this.sheetName = sheetResponse.Sheets[0].Properties.Title;
-
-                return true;
             }
-
-            return false;
+            return true;
         }
 
-        internal void Set(string cellName1, string cellName2, string value1, string value2, string value3, string value4)
+        internal void Set(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5)
         {
             if (!string.IsNullOrEmpty(value1))
             {
                 var range = this.sheetName + "!" + cellName1 + ":" + cellName2;
-                var values = new List<List<object>> { new List<object> { value1, value2, value3, value4 } };
+                var values = new List<List<object>> { new List<object> { value1, value2, value3, value4, value5 } };
 
                 var request = this.sheetService.Spreadsheets.Values.Update(
                     new ValueRange { Values = new List<IList<object>>(values) },
@@ -99,10 +122,10 @@ namespace Snowfall
                 request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
                 var response = request.Execute();
             }
-            
+
         }
 
-        public TaskBody Get(string cellName, string cellName2)
+        public BindingList<TaskBody> Get(string cellName, string cellName2)
         {
             var range = this.sheetName + "!" + cellName + ":" + cellName2;
 
@@ -112,41 +135,22 @@ namespace Snowfall
                 );
             var response = request.Execute();
 
-            TaskBody taskBody = new TaskBody();
+            BindingList<TaskBody> resultList = new BindingList<TaskBody>();
 
-            if (response.Values.Count > 0 && response.Values[0].Count > 0)
+            for (int i = 0; i < response.Values.Count; i++)
             {
-                taskBody.Task = response.Values[0][0].ToString();
+                TaskBody taskBody = new TaskBody();
 
-                if (response.Values[0].Count > 1 && response.Values[0][1] != null)
-                {
-                    taskBody.Status = Convert.ToBoolean(response.Values[0][1]);
-                }
-                else
-                {
-                    taskBody.Status = false;
-                }
+                taskBody.Task = response.Values[i][0].ToString();
+                taskBody.Status = Convert.ToBoolean(response.Values[i][1]);
+                taskBody.Category = response.Values[i][2].ToString();
+                taskBody.Time = response.Values[i][3].ToString();
+                taskBody.TimeUpdate = response.Values[i][4].ToString();
 
-                if (response.Values[0].Count > 2 && response.Values[0][2] != null)
-                {
-                    taskBody.Category = response.Values[0][2].ToString();
-                }
-                else
-                {
-                    taskBody.Category = "";
-                }
-
-                if (response.Values[0].Count > 3 && response.Values[0][3] != null)
-                {
-                    taskBody.Time = response.Values[0][3].ToString();
-                }
-                else
-                {
-                    taskBody.Time = "";
-                }
+                resultList.Add(taskBody);
             }
 
-            return taskBody;
+            return resultList;
         }
 
         public int GetCountOfRaws(string cellName, string cellName2)
@@ -163,8 +167,34 @@ namespace Snowfall
             {
                 return 0;
             }
-            
+
             return response.Values.Count;
         }
+
+        public void DeleteRow(int rowIndex)
+        {
+            var deleteRequest = new Request
+            {
+                DeleteDimension = new DeleteDimensionRequest
+                {
+                    Range = new DimensionRange
+                    {
+                        SheetId = 1,
+                        Dimension = "ROWS",
+                        StartIndex = rowIndex,
+                        EndIndex = rowIndex + 1
+                    }
+                }
+            };
+
+            var batchUpdateRequest = new BatchUpdateSpreadsheetRequest
+            {
+                Requests = new List<Request> { deleteRequest }
+            };
+
+            var request = sheetService.Spreadsheets.BatchUpdate(batchUpdateRequest, this.sheetFileId);
+            request.Execute();
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Snowfall
+﻿namespace Snowfall.Service
 {
     public static class ThemeColor
     {
