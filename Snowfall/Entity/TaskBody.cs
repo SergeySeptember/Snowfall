@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
-namespace Snowfall
+namespace Snowfall.Entity
 {
     public class TaskBody
     {
@@ -33,7 +27,7 @@ namespace Snowfall
                 _status = value;
             }
         }
-        
+
         public string Category
         {
             get => _category;

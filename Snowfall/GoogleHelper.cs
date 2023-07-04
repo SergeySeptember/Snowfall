@@ -3,12 +3,13 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Util.Store;
+using Snowfall.Entity;
 using System.ComponentModel;
 using System.Text;
 
 namespace Snowfall
 {
-    class GoogleHelper
+    public class GoogleHelper
     {
         private readonly string token;
         private readonly string sheetFileName;
@@ -107,7 +108,7 @@ namespace Snowfall
             return true;
         }
 
-        internal void Set(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5)
+        internal void SetTasks(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5)
         {
             if (!string.IsNullOrEmpty(value1))
             {
@@ -125,7 +126,7 @@ namespace Snowfall
 
         }
 
-        public BindingList<TaskBody> Get(string cellName, string cellName2)
+        public BindingList<TaskBody> GetTasks(string cellName, string cellName2)
         {
             var range = this.sheetName + "!" + cellName + ":" + cellName2;
 
@@ -153,7 +154,7 @@ namespace Snowfall
             return resultList;
         }
 
-        public int GetCountOfRaws(string cellName, string cellName2)
+        public int GetCountOfTasks(string cellName, string cellName2)
         {
             var range = this.sheetName + "!" + cellName + ":" + cellName2;
 
@@ -195,6 +196,29 @@ namespace Snowfall
             var request = sheetService.Spreadsheets.BatchUpdate(batchUpdateRequest, this.sheetFileId);
             request.Execute();
         }
+        public BindingList<NoteBody> GetNotes(string cellName, string cellName2)
+        {
+            var range = "Notes!" + "A1" + ":" + "B3";
 
+            var request = this.sheetService.Spreadsheets.Values.Get(
+                spreadsheetId: this.sheetFileId,
+                range: range
+                );
+            var response = request.Execute();
+
+            BindingList<NoteBody> resultList = new BindingList<NoteBody>();
+
+            for (int i = 0; i < response.Values.Count; i++)
+            {
+                NoteBody noteBody = new NoteBody();
+
+                noteBody.NoteName = response.Values[i][0].ToString();
+                noteBody.Description = response.Values[i][1].ToString();
+
+                resultList.Add(noteBody);
+            }
+
+            return resultList;
+        }
     }
 }

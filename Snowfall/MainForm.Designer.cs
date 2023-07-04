@@ -29,22 +29,29 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             panelMenu = new Panel();
-            buttonTest = new Button();
             buttonSettings = new Button();
             buttonNote = new Button();
             buttonList = new Button();
             panelLogo = new Panel();
             labelLogo = new Label();
+            buttonAll = new Button();
             panelTitleBar = new Panel();
-            label1 = new Label();
+            buttonMin = new Button();
             buttonClose = new Button();
+            buttonFalse = new Button();
+            buttonTrue = new Button();
             panelDesktop = new Panel();
             dataGridView1 = new DataGridView();
             contextMenu = new ContextMenuStrip(components);
             deleteToolStripMenuItem = new ToolStripMenuItem();
+            toolTipAll = new ToolTip(components);
+            toolTipTrue = new ToolTip(components);
+            toolTipFalse = new ToolTip(components);
+            labelOnline = new Label();
             panelMenu.SuspendLayout();
             panelLogo.SuspendLayout();
             panelTitleBar.SuspendLayout();
@@ -56,7 +63,7 @@
             // panelMenu
             // 
             panelMenu.BackColor = Color.FromArgb(51, 51, 73);
-            panelMenu.Controls.Add(buttonTest);
+            panelMenu.Controls.Add(labelOnline);
             panelMenu.Controls.Add(buttonSettings);
             panelMenu.Controls.Add(buttonNote);
             panelMenu.Controls.Add(buttonList);
@@ -67,20 +74,6 @@
             panelMenu.Size = new Size(217, 561);
             panelMenu.TabIndex = 13;
             panelMenu.MouseDown += PanelMenu_MouseDown;
-            // 
-            // buttonTest
-            // 
-            buttonTest.Dock = DockStyle.Top;
-            buttonTest.FlatAppearance.BorderSize = 0;
-            buttonTest.FlatStyle = FlatStyle.Flat;
-            buttonTest.ForeColor = Color.Gainsboro;
-            buttonTest.Location = new Point(0, 243);
-            buttonTest.Name = "buttonTest";
-            buttonTest.Size = new Size(217, 60);
-            buttonTest.TabIndex = 4;
-            buttonTest.Text = "Test";
-            buttonTest.UseVisualStyleBackColor = true;
-            buttonTest.Click += ButtonTest_Click;
             // 
             // buttonSettings
             // 
@@ -150,11 +143,28 @@
             labelLogo.TabIndex = 0;
             labelLogo.Text = "Snowfall";
             // 
+            // buttonAll
+            // 
+            buttonAll.BackgroundImage = (Image)resources.GetObject("buttonAll.BackgroundImage");
+            buttonAll.BackgroundImageLayout = ImageLayout.Stretch;
+            buttonAll.FlatAppearance.BorderSize = 0;
+            buttonAll.FlatStyle = FlatStyle.Flat;
+            buttonAll.Location = new Point(11, 8);
+            buttonAll.Name = "buttonAll";
+            buttonAll.Size = new Size(35, 35);
+            buttonAll.TabIndex = 4;
+            toolTipAll.SetToolTip(buttonAll, "Show all tasks");
+            buttonAll.UseVisualStyleBackColor = true;
+            buttonAll.Click += ButtonAll_Click;
+            // 
             // panelTitleBar
             // 
             panelTitleBar.BackColor = Color.FromArgb(0, 150, 136);
-            panelTitleBar.Controls.Add(label1);
+            panelTitleBar.Controls.Add(buttonMin);
             panelTitleBar.Controls.Add(buttonClose);
+            panelTitleBar.Controls.Add(buttonAll);
+            panelTitleBar.Controls.Add(buttonFalse);
+            panelTitleBar.Controls.Add(buttonTrue);
             panelTitleBar.Dock = DockStyle.Top;
             panelTitleBar.Location = new Point(217, 0);
             panelTitleBar.Name = "panelTitleBar";
@@ -162,28 +172,59 @@
             panelTitleBar.TabIndex = 14;
             panelTitleBar.MouseDown += PanelTitleBar_MouseDown;
             // 
-            // label1
+            // buttonMin
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(6, 15);
-            label1.Name = "label1";
-            label1.Size = new Size(462, 21);
-            label1.TabIndex = 1;
-            label1.Text = "Здесь будет список категорий, для переключения между ними";
+            buttonMin.BackgroundImage = (Image)resources.GetObject("buttonMin.BackgroundImage");
+            buttonMin.BackgroundImageLayout = ImageLayout.Stretch;
+            buttonMin.FlatAppearance.BorderSize = 0;
+            buttonMin.FlatStyle = FlatStyle.Flat;
+            buttonMin.Location = new Point(702, 22);
+            buttonMin.Name = "buttonMin";
+            buttonMin.Size = new Size(20, 20);
+            buttonMin.TabIndex = 10;
+            buttonMin.UseVisualStyleBackColor = true;
+            buttonMin.Click += ButtonMin_Click;
             // 
             // buttonClose
             // 
-            buttonClose.BackgroundImage = Properties.Resources.close_icon;
+            buttonClose.BackgroundImage = (Image)resources.GetObject("buttonClose.BackgroundImage");
             buttonClose.BackgroundImageLayout = ImageLayout.Stretch;
             buttonClose.FlatAppearance.BorderSize = 0;
             buttonClose.FlatStyle = FlatStyle.Flat;
-            buttonClose.Location = new Point(728, 12);
+            buttonClose.Location = new Point(735, 15);
             buttonClose.Name = "buttonClose";
-            buttonClose.Size = new Size(27, 24);
+            buttonClose.Size = new Size(20, 20);
             buttonClose.TabIndex = 0;
             buttonClose.UseVisualStyleBackColor = true;
             buttonClose.Click += ButtonClose_Click;
+            // 
+            // buttonFalse
+            // 
+            buttonFalse.BackgroundImage = (Image)resources.GetObject("buttonFalse.BackgroundImage");
+            buttonFalse.BackgroundImageLayout = ImageLayout.Stretch;
+            buttonFalse.FlatAppearance.BorderSize = 0;
+            buttonFalse.FlatStyle = FlatStyle.Flat;
+            buttonFalse.Location = new Point(116, 8);
+            buttonFalse.Name = "buttonFalse";
+            buttonFalse.Size = new Size(35, 35);
+            buttonFalse.TabIndex = 5;
+            toolTipFalse.SetToolTip(buttonFalse, "Show all pending");
+            buttonFalse.UseVisualStyleBackColor = true;
+            buttonFalse.Click += ButtonFalse_Click;
+            // 
+            // buttonTrue
+            // 
+            buttonTrue.BackgroundImage = (Image)resources.GetObject("buttonTrue.BackgroundImage");
+            buttonTrue.BackgroundImageLayout = ImageLayout.Stretch;
+            buttonTrue.FlatAppearance.BorderSize = 0;
+            buttonTrue.FlatStyle = FlatStyle.Flat;
+            buttonTrue.Location = new Point(60, 8);
+            buttonTrue.Name = "buttonTrue";
+            buttonTrue.Size = new Size(35, 35);
+            buttonTrue.TabIndex = 6;
+            toolTipTrue.SetToolTip(buttonTrue, "Показать все выполненные");
+            buttonTrue.UseVisualStyleBackColor = true;
+            buttonTrue.Click += ButtonTrue_Click;
             // 
             // panelDesktop
             // 
@@ -225,21 +266,30 @@
             dataGridView1.SelectionMode = DataGridViewSelectionMode.CellSelect;
             dataGridView1.Size = new Size(767, 511);
             dataGridView1.TabIndex = 12;
-            dataGridView1.CellEndEdit += SaveCellEditAsync;
+            dataGridView1.CellEndEdit += SaveCellEdit;
             dataGridView1.CellMouseDown += DataGridView1_CellMouseDown;
             // 
             // contextMenu
             // 
             contextMenu.Items.AddRange(new ToolStripItem[] { deleteToolStripMenuItem });
             contextMenu.Name = "contextMenu";
-            contextMenu.Size = new Size(181, 48);
+            contextMenu.Size = new Size(108, 26);
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new Size(180, 22);
+            deleteToolStripMenuItem.Size = new Size(107, 22);
             deleteToolStripMenuItem.Text = "Delete";
             deleteToolStripMenuItem.Click += DeleteToolStripMenuItem_Click;
+            // 
+            // labelOnline
+            // 
+            labelOnline.AutoSize = true;
+            labelOnline.Location = new Point(12, 537);
+            labelOnline.Name = "labelOnline";
+            labelOnline.Size = new Size(38, 15);
+            labelOnline.TabIndex = 4;
+            labelOnline.Text = "label1";
             // 
             // MainForm
             // 
@@ -257,10 +307,10 @@
             Load += Form1_Load;
             KeyDown += MainForm_KeyDown;
             panelMenu.ResumeLayout(false);
+            panelMenu.PerformLayout();
             panelLogo.ResumeLayout(false);
             panelLogo.PerformLayout();
             panelTitleBar.ResumeLayout(false);
-            panelTitleBar.PerformLayout();
             panelDesktop.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             contextMenu.ResumeLayout(false);
@@ -277,10 +327,16 @@
         private Panel panelDesktop;
         private Button buttonSettings;
         private Button buttonClose;
-        private Label label1;
-        private Button buttonTest;
         private DataGridView dataGridView1;
         private ContextMenuStrip contextMenu;
         private ToolStripMenuItem deleteToolStripMenuItem;
+        private Button buttonAll;
+        private Button buttonTrue;
+        private Button buttonFalse;
+        private Button buttonMin;
+        private ToolTip toolTipAll;
+        private ToolTip toolTipFalse;
+        private ToolTip toolTipTrue;
+        private Label labelOnline;
     }
 }
