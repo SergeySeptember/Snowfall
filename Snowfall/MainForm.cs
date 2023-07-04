@@ -1,3 +1,5 @@
+using Snowfall.Entity;
+using Snowfall.Forms;
 using Snowfall.Service;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -6,17 +8,23 @@ namespace Snowfall
 {
     public partial class MainForm : Form
     {
-        private GoogleHelper googleHelper;
+        public GoogleHelper googleHelper;
         private string[] token = File.ReadAllLines(@"C:\Users\September\source\repos\Snowfall\Documents\token.json");
         private string todoSheet = "Snowfall";
         private string pathOfTasks = $"{Environment.CurrentDirectory}\\ListOfTasks.json";
+        private string pathOfNotes = $"{Environment.CurrentDirectory}\\ListOfNotes.json";
         private bool successConnect = true;
+        private bool categoryFlag = false;
         private Button currentButton;
         private Form activeForm;
+        public FormNotes formNotes;
 
         private BindingList<TaskBody> listOfTasksGDrive = new BindingList<TaskBody>();
         private BindingList<TaskBody> listOfTasksJSON = new BindingList<TaskBody>();
         private BindingList<TaskBody> listOfTasks = new BindingList<TaskBody>();
+        private BindingList<TaskBody> category = new BindingList<TaskBody>();
+
+        BindingList<NoteBody> listOfNotes = new BindingList<NoteBody>();
 
         public MainForm()
         {
@@ -26,15 +34,13 @@ namespace Snowfall
         private void Form1_Load(object sender, EventArgs e)
         {
             InitialLoad();
-
-            dataGridView1.DataSource = listOfTasks;
-
             ColumnsConfig();
         }
 
         private void InitialLoad()
         {
             googleHelper = new GoogleHelper(token[0], todoSheet);
+            
 
             try
             {
@@ -46,24 +52,35 @@ namespace Snowfall
             }
 
             if (successConnect == true)
+            {
                 LoadAndSortData();
+                listOfNotes = googleHelper.GetNotes(cellName: $"A{1}", cellName2: $"B{3}");
+                FileIOService.SaveNotesToJson(listOfNotes, pathOfNotes);
+                labelOnline.Text = "Online";
+            }
             else
-                LoadDataFromJson();
+            {
+                GetTasksFromJson();
+                dataGridView1.DataSource = listOfTasksJSON;
+                GetNotesFromJsons();
+                labelOnline.Text = "Offline";
+            }
+                
         }
 
         private void LoadDataFromGDrive()
         {
-            int countOfRawOnGDrive = googleHelper.GetCountOfRaws(cellName: "A", cellName2: "A");
+            int countOfRawOnGDrive = googleHelper.GetCountOfTasks(cellName: "A", cellName2: "A");
             if (countOfRawOnGDrive != 0)
             {
-                listOfTasksGDrive = googleHelper.Get(cellName: $"A{1}", cellName2: $"E{countOfRawOnGDrive}");
+                listOfTasksGDrive = googleHelper.GetTasks(cellName: $"A{1}", cellName2: $"E{countOfRawOnGDrive}");
             }
         }
 
         private void LoadAndSortData()
         {
             LoadDataFromGDrive();
-            LoadDataFromJson();
+            GetTasksFromJson();
 
             int countOfRawGDrive = listOfTasksGDrive.Count;
             int countOfRawJson = listOfTasksJSON.Count;
@@ -94,56 +111,86 @@ namespace Snowfall
             {
                 listOfTasks.Add(listOfTasksGDrive[i]);
             }
+
+            FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
+            dataGridView1.DataSource = listOfTasks;
         }
 
-        private void LoadDataFromJson()
+        private void GetTasksFromJson()
         {
-            listOfTasksJSON = FileIOService.LoadData(pathOfTasks);
+            listOfTasksJSON = FileIOService.LoadTasksFromJson(pathOfTasks);
         }
 
-        private void EditTask(int index, TaskBody currentTaskBody)
+        private void GetNotesFromJsons()
         {
-            if (listOfTasks.Count < index)
+            listOfNotes = FileIOService.LoadNotesFromJson(pathOfNotes);
+        }
+
+        private void SaveCellEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (categoryFlag == true)
             {
-                listOfTasks.Add(currentTaskBody);
+                int index = dataGridView1.CurrentCell.RowIndex;
+
+                if (category.Count > index && !string.IsNullOrWhiteSpace(category[index].Task))
+                {
+                    string searchTask = category[index].Task;
+                    int generalIndex = 0;
+
+                    for (int i = 0; i < listOfTasks.Count; i++)
+                    {
+                        if (listOfTasks[i].Task == searchTask)
+                        {
+                            generalIndex = i;
+                            break;
+                        }
+                    }
+
+                    listOfTasks[generalIndex].TimeUpdate = DateTime.Now.ToString();
+
+                    if (successConnect == true)
+                    {
+                        int lineNumber = generalIndex + 1;
+
+                        googleHelper.SetTasks(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", listOfTasks[generalIndex].Task, listOfTasks[generalIndex].Status.ToString(), listOfTasks[generalIndex].Category, listOfTasks[generalIndex].Time, listOfTasks[generalIndex].TimeUpdate);
+                    }
+
+                    RemoveWhiteSpace();
+
+                    FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
+                }
+
             }
             else
             {
-                listOfTasks[index].Task = currentTaskBody.Task;
-                listOfTasks[index].Status = currentTaskBody.Status;
-                listOfTasks[index].Category = currentTaskBody.Category;
-                listOfTasks[index].Time = currentTaskBody.Time;
-                listOfTasks[index].TimeUpdate = DateTime.Now.ToString();
+                int index = dataGridView1.CurrentCell.RowIndex;
+
+                if (listOfTasks.Count > index && !string.IsNullOrWhiteSpace(listOfTasks[index].Task))
+                {
+                    listOfTasks[index].TimeUpdate = DateTime.Now.ToString();
+
+                    if (successConnect == true)
+                    {
+                        int lineNumber = dataGridView1.CurrentCell.RowIndex + 1;
+
+                        googleHelper.SetTasks(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", listOfTasks[index].Task, listOfTasks[index].Status.ToString(), listOfTasks[index].Category, listOfTasks[index].Time, listOfTasks[index].TimeUpdate);
+                    }
+
+                    RemoveWhiteSpace();
+
+                    FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
+                }
             }
         }
 
-        private async void SaveCellEditAsync(object sender, DataGridViewCellEventArgs e)
+        private void RemoveWhiteSpace()
         {
-            int index = dataGridView1.CurrentCell.RowIndex;
-
-            if (listOfTasks.Count > index && !string.IsNullOrWhiteSpace(listOfTasks[index].Task))
+            for (int i = listOfTasks.Count - 1; i >= 0; i--)
             {
-                var currentTaskBody = listOfTasks[index];
-
-                EditTask(index, currentTaskBody);
-
-                if (successConnect == true)
+                if (string.IsNullOrWhiteSpace(listOfTasks[i].Task))
                 {
-                    int lineNumber = dataGridView1.CurrentCell.RowIndex + 1;
-                    var taskBody = listOfTasks[index];
-
-                    googleHelper.Set(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", taskBody.Task, taskBody.Status.ToString(), taskBody.Category, taskBody.Time, taskBody.TimeUpdate = DateTime.Now.ToString());
+                    listOfTasks.RemoveAt(i);
                 }
-
-                for (int i = listOfTasks.Count - 1; i >= 0; i--)
-                {
-                    if (string.IsNullOrWhiteSpace(listOfTasks[i].Task))
-                    {
-                        listOfTasks.RemoveAt(i);
-                    }
-                }
-
-                FileIOService.SaveData(listOfTasks, pathOfTasks);
             }
         }
 
@@ -155,17 +202,22 @@ namespace Snowfall
                 LoadDataFromGDrive();
                 listOfTasks.Clear();
                 listOfTasks = listOfTasksGDrive;
-                await Task.Run(() => FileIOService.SaveData(listOfTasks, pathOfTasks));
+                await Task.Run(() => FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks));
             }
         }
 
-        private void OrderByCategory()
+        private void OrderByFalse()
         {
-            string category = "Project";
-            List<TaskBody> categories = new List<TaskBody>();
-            categories = listOfTasks.Where(b => b.Category == category).ToList();
-            
+            var filteredTasks = listOfTasks.Where(b => b.Status == false).ToList();
+            category = new BindingList<TaskBody>(filteredTasks);
+            dataGridView1.DataSource = category;
+        }
 
+        private void OrderByTrue()
+        {
+            var filteredTasks = listOfTasks.Where(b => b.Status == true).ToList();
+            category = new BindingList<TaskBody>(filteredTasks);
+            dataGridView1.DataSource = category;
         }
 
         # region [Theme]
@@ -235,23 +287,6 @@ namespace Snowfall
             childForm.Show();
         }
 
-        private void ButtonList_Click(object sender, EventArgs e)
-        {
-            if (activeForm != null)
-                activeForm.Close();
-            Reset();
-            ActivateButton(sender);
-        }
-
-        private void ButtonNote_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new Forms.FormNotes(), sender);
-        }
-        private void ButtonSettings_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new Forms.FormSettings(), sender);
-        }
-
         private void Reset()
         {
             DisableButton();
@@ -281,29 +316,39 @@ namespace Snowfall
         }
         #endregion
 
+        private void ButtonList_Click(object sender, EventArgs e)
+        {
+            if (activeForm != null)
+                activeForm.Close();
+            Reset();
+            ActivateButton(sender);
+            buttonAll.Visible = true;
+            buttonTrue.Visible = true;
+            buttonFalse.Visible = true;
+        }
+
+        private void ButtonNote_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new FormNotes(googleHelper, listOfNotes), sender);
+            buttonAll.Visible = false;
+            buttonTrue.Visible = false;
+            buttonFalse.Visible = false;
+        }
+        private void ButtonSettings_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new Forms.FormSettings(), sender);
+            buttonAll.Visible = false;
+            buttonTrue.Visible = false;
+            buttonFalse.Visible = false;
+        }
         private void ButtonClose_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
-        private void ButtonTest_Click(object sender, EventArgs e)
+        private void ButtonMin_Click(object sender, EventArgs e)
         {
-            OrderByCategory();
-
-            
-
-            string searchTask = "Собрать вещи";
-            int index = -1;
-
-            for (int i = 0; i < listOfTasks.Count; i++)
-            {
-                if (listOfTasks[i].Task == searchTask)
-                {
-                    index = i;
-                    break;
-                }
-            }
-
+            WindowState = FormWindowState.Minimized;
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -340,9 +385,51 @@ namespace Snowfall
 
         private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int index = dataGridView1.CurrentCell.RowIndex;
-            listOfTasks.RemoveAt(index);
-            this.googleHelper.DeleteRow(index);
+            if (categoryFlag == true)
+            {
+                int index = dataGridView1.CurrentCell.RowIndex;
+                string searchTask = category[index].Task;
+                int generalIndex = 0;
+
+                for (int i = 0; i < listOfTasks.Count; i++)
+                {
+                    if (listOfTasks[i].Task == searchTask)
+                    {
+                        generalIndex = i;
+                        break;
+                    }
+                }
+                category.RemoveAt(index);
+                listOfTasks.RemoveAt(generalIndex);
+                this.googleHelper.DeleteRow(generalIndex);
+                FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
+            }
+            else
+            {
+                int index = dataGridView1.CurrentCell.RowIndex;
+                listOfTasks.RemoveAt(index);
+                this.googleHelper.DeleteRow(index);
+                FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
+            }
         }
+
+        private void ButtonAll_Click(object sender, EventArgs e)
+        {
+            dataGridView1.DataSource = listOfTasks;
+            categoryFlag = false;
+        }
+
+        private void ButtonTrue_Click(object sender, EventArgs e)
+        {
+            OrderByTrue();
+            categoryFlag = true;
+        }
+
+        private void ButtonFalse_Click(object sender, EventArgs e)
+        {
+            OrderByFalse();
+            categoryFlag = true;
+        }
+
     }
 }
