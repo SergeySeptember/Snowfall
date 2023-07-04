@@ -53,9 +53,13 @@ namespace Snowfall
 
             if (successConnect == true)
             {
+                int count = googleHelper.GetCountOfNotes();
+
                 LoadAndSortData();
-                listOfNotes = googleHelper.GetNotes(cellName: $"A{1}", cellName2: $"B{3}");
+
+                listOfNotes = googleHelper.GetNotes(cellName: $"A{1}", cellName2: $"B{count}");
                 FileIOService.SaveNotesToJson(listOfNotes, pathOfNotes);
+
                 labelOnline.Text = "Online";
             }
             else
@@ -70,7 +74,7 @@ namespace Snowfall
 
         private void LoadDataFromGDrive()
         {
-            int countOfRawOnGDrive = googleHelper.GetCountOfTasks(cellName: "A", cellName2: "A");
+            int countOfRawOnGDrive = googleHelper.GetCountOfTasks();
             if (countOfRawOnGDrive != 0)
             {
                 listOfTasksGDrive = googleHelper.GetTasks(cellName: $"A{1}", cellName2: $"E{countOfRawOnGDrive}");
@@ -329,7 +333,7 @@ namespace Snowfall
 
         private void ButtonNote_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new FormNotes(googleHelper, listOfNotes), sender);
+            OpenChildForm(new FormNotes(googleHelper, listOfNotes, successConnect, pathOfNotes), sender);
             buttonAll.Visible = false;
             buttonTrue.Visible = false;
             buttonFalse.Visible = false;
@@ -401,14 +405,14 @@ namespace Snowfall
                 }
                 category.RemoveAt(index);
                 listOfTasks.RemoveAt(generalIndex);
-                this.googleHelper.DeleteRow(generalIndex);
+                googleHelper.DeleteRowOfTask(generalIndex);
                 FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
             }
             else
             {
                 int index = dataGridView1.CurrentCell.RowIndex;
                 listOfTasks.RemoveAt(index);
-                this.googleHelper.DeleteRow(index);
+                googleHelper.DeleteRowOfTask(index);
                 FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
             }
         }

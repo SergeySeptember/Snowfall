@@ -108,10 +108,8 @@ namespace Snowfall
             return true;
         }
 
-        internal void SetTasks(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5)
+        public void SetTasks(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5)
         {
-            if (!string.IsNullOrEmpty(value1))
-            {
                 var range = this.sheetName + "!" + cellName1 + ":" + cellName2;
                 var values = new List<List<object>> { new List<object> { value1, value2, value3, value4, value5 } };
 
@@ -122,8 +120,6 @@ namespace Snowfall
                     );
                 request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
                 var response = request.Execute();
-            }
-
         }
 
         public BindingList<TaskBody> GetTasks(string cellName, string cellName2)
@@ -154,9 +150,9 @@ namespace Snowfall
             return resultList;
         }
 
-        public int GetCountOfTasks(string cellName, string cellName2)
+        public int GetCountOfTasks()
         {
-            var range = this.sheetName + "!" + cellName + ":" + cellName2;
+            var range = this.sheetName + "!A:A";
 
             var request = this.sheetService.Spreadsheets.Values.Get(
                 spreadsheetId: this.sheetFileId,
@@ -172,7 +168,7 @@ namespace Snowfall
             return response.Values.Count;
         }
 
-        public void DeleteRow(int rowIndex)
+        public void DeleteRowOfTask(int rowIndex)
         {
             var deleteRequest = new Request
             {
@@ -198,7 +194,7 @@ namespace Snowfall
         }
         public BindingList<NoteBody> GetNotes(string cellName, string cellName2)
         {
-            var range = "Notes!" + "A1" + ":" + "B3";
+            var range = "Notes!" + cellName + ":" + cellName2;
 
             var request = this.sheetService.Spreadsheets.Values.Get(
                 spreadsheetId: this.sheetFileId,
@@ -213,12 +209,72 @@ namespace Snowfall
                 NoteBody noteBody = new NoteBody();
 
                 noteBody.NoteName = response.Values[i][0].ToString();
-                noteBody.Description = response.Values[i][1].ToString();
+
+                if (response.Values[i].Count > 1)
+                    noteBody.Description = response.Values[i][1].ToString();
+                else
+                    noteBody.Description = "Введите текст";
 
                 resultList.Add(noteBody);
             }
 
             return resultList;
+        }
+
+        public int GetCountOfNotes()
+        {
+            var range = "Notes!" + "A" + ":" + "A";
+
+            var request = this.sheetService.Spreadsheets.Values.Get(
+                spreadsheetId: this.sheetFileId,
+                range: range
+                );
+            var response = request.Execute();
+
+            if (response.Values is null)
+            {
+                return 0;
+            }
+
+            return response.Values.Count;
+        }
+
+        public void SetNotes(string cellName1, string cellName2, string value1, string value2)
+        {
+            var range = "Notes!" + cellName1 + ":" + cellName2;
+            var values = new List<List<object>> { new List<object> { value1, value2 } };
+            var request = this.sheetService.Spreadsheets.Values.Update(
+            new ValueRange { Values = new List<IList<object>>(values) },
+            spreadsheetId: this.sheetFileId,
+            range: range
+                );
+            request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            var response = request.Execute();
+        }
+
+        public void DeleteRowOfNotes(int rowIndex)
+        {
+            var deleteRequest = new Request
+            {
+                DeleteDimension = new DeleteDimensionRequest
+                {
+                    Range = new DimensionRange
+                    {
+                        SheetId = 2,
+                        Dimension = "ROWS",
+                        StartIndex = rowIndex,
+                        EndIndex = rowIndex + 1
+                    }
+                }
+            };
+
+            var batchUpdateRequest = new BatchUpdateSpreadsheetRequest
+            {
+                Requests = new List<Request> { deleteRequest }
+            };
+
+            var request = sheetService.Spreadsheets.BatchUpdate(batchUpdateRequest, this.sheetFileId);
+            request.Execute();
         }
     }
 }
