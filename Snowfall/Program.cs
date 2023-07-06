@@ -11,7 +11,13 @@ namespace Snowfall
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
+            Application.ThreadException += new ThreadExceptionEventHandler(Exception);
             Application.Run(new MainForm());
+        }
+
+        private static void Exception(object sender, ThreadExceptionEventArgs e)
+        {
+            MessageBox.Show(e.Exception.ToString());
         }
     }
 }

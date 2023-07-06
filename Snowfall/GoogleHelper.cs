@@ -46,6 +46,11 @@ namespace Snowfall
                     new FileDataStore(credentialPath, true));
             }
 
+            if (this.credentials == null)
+            {
+                return false;
+            }
+
             this.driveService = new DriveService(new Google.Apis.Services.BaseClientService.Initializer
             {
                 HttpClientInitializer = this.credentials,
@@ -108,10 +113,10 @@ namespace Snowfall
             return true;
         }
 
-        public void SetTasks(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5)
+        public void SetTasks(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5, string value6)
         {
                 var range = this.sheetName + "!" + cellName1 + ":" + cellName2;
-                var values = new List<List<object>> { new List<object> { value1, value2, value3, value4, value5 } };
+                var values = new List<List<object>> { new List<object> { value1, value2, value3, value4, value5, value6 } };
 
                 var request = this.sheetService.Spreadsheets.Values.Update(
                     new ValueRange { Values = new List<IList<object>>(values) },
@@ -143,6 +148,7 @@ namespace Snowfall
                 taskBody.Category = response.Values[i][2].ToString();
                 taskBody.Time = response.Values[i][3].ToString();
                 taskBody.TimeUpdate = response.Values[i][4].ToString();
+                taskBody.IsDeleted = Convert.ToBoolean(response.Values[i][5]);
 
                 resultList.Add(taskBody);
             }

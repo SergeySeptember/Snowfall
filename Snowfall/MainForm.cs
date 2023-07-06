@@ -9,12 +9,13 @@ namespace Snowfall
     public partial class MainForm : Form
     {
         public GoogleHelper googleHelper;
-        private string[] token = File.ReadAllLines(@"C:\Users\September\source\repos\Snowfall\Documents\token.json");
+        private string[] token = File.ReadAllLines($"{Environment.CurrentDirectory}\\ListOfTasks.json");
         private string todoSheet = "Snowfall";
         private string pathOfTasks = $"{Environment.CurrentDirectory}\\ListOfTasks.json";
         private string pathOfNotes = $"{Environment.CurrentDirectory}\\ListOfNotes.json";
         private bool successConnect = true;
         private bool categoryFlag = false;
+        private bool categorySortByTrue = false;
         private Button currentButton;
         private Form activeForm;
         public FormNotes formNotes;
@@ -31,20 +32,19 @@ namespace Snowfall
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
-            InitialLoad();
+            await InitialLoad();
             ColumnsConfig();
         }
 
-        private void InitialLoad()
+        private async Task InitialLoad()
         {
             googleHelper = new GoogleHelper(token[0], todoSheet);
-            
 
             try
             {
-                successConnect = this.googleHelper.Start().Result;
+                successConnect = await googleHelper.Start();
             }
             catch (Exception)
             {
@@ -65,29 +65,29 @@ namespace Snowfall
             else
             {
                 GetTasksFromJson();
-                dataGridView1.DataSource = listOfTasksJSON;
+                dataGridViewTasks.DataSource = listOfTasksJSON;
                 GetNotesFromJsons();
                 labelOnline.Text = "Offline";
             }
-                
+
         }
 
-        private void LoadDataFromGDrive()
+        private void GetTasksFromGDrive()
         {
             int countOfRawOnGDrive = googleHelper.GetCountOfTasks();
             if (countOfRawOnGDrive != 0)
             {
-                listOfTasksGDrive = googleHelper.GetTasks(cellName: $"A{1}", cellName2: $"E{countOfRawOnGDrive}");
+                listOfTasksGDrive = googleHelper.GetTasks(cellName: $"A{1}", cellName2: $"F{countOfRawOnGDrive}");
             }
         }
 
         private void LoadAndSortData()
         {
-            LoadDataFromGDrive();
+            GetTasksFromGDrive();
             GetTasksFromJson();
 
-            int countOfRawGDrive = listOfTasksGDrive.Count;
             int countOfRawJson = listOfTasksJSON.Count;
+            int countOfRawGDrive = listOfTasksGDrive.Count;
 
             int minCount = Math.Min(countOfRawJson, countOfRawGDrive);
 
@@ -117,7 +117,15 @@ namespace Snowfall
             }
 
             FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
-            dataGridView1.DataSource = listOfTasks;
+
+            FilterTasks();
+        }
+
+        private void FilterTasks()
+        {
+            var filteredTasks = listOfTasks.Where(b => b.IsDeleted == false).ToList();
+            listOfTasks = new BindingList<TaskBody>(filteredTasks);
+            dataGridViewTasks.DataSource = listOfTasks;
         }
 
         private void GetTasksFromJson()
@@ -129,12 +137,12 @@ namespace Snowfall
         {
             listOfNotes = FileIOService.LoadNotesFromJson(pathOfNotes);
         }
-
+        // todo сделать метод, заносит изменения в таблицу. Номер линии не из датагрид, а индексу листа +1
         private void SaveCellEdit(object sender, DataGridViewCellEventArgs e)
         {
             if (categoryFlag == true)
             {
-                int index = dataGridView1.CurrentCell.RowIndex;
+                int index = dataGridViewTasks.CurrentCell.RowIndex;
 
                 if (category.Count > index && !string.IsNullOrWhiteSpace(category[index].Task))
                 {
@@ -156,7 +164,10 @@ namespace Snowfall
                     {
                         int lineNumber = generalIndex + 1;
 
-                        googleHelper.SetTasks(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", listOfTasks[generalIndex].Task, listOfTasks[generalIndex].Status.ToString(), listOfTasks[generalIndex].Category, listOfTasks[generalIndex].Time, listOfTasks[generalIndex].TimeUpdate);
+                        googleHelper.SetTasks(
+                            cellName1: $"A{lineNumber}", cellName2: $"F{lineNumber}", listOfTasks[generalIndex].Task,
+                            listOfTasks[generalIndex].Status.ToString(), listOfTasks[generalIndex].Category,
+                            listOfTasks[generalIndex].Time, listOfTasks[generalIndex].TimeUpdate, listOfTasks[generalIndex].IsDeleted.ToString());
                     }
 
                     RemoveWhiteSpace();
@@ -167,7 +178,7 @@ namespace Snowfall
             }
             else
             {
-                int index = dataGridView1.CurrentCell.RowIndex;
+                int index = dataGridViewTasks.CurrentCell.RowIndex;
 
                 if (listOfTasks.Count > index && !string.IsNullOrWhiteSpace(listOfTasks[index].Task))
                 {
@@ -175,9 +186,12 @@ namespace Snowfall
 
                     if (successConnect == true)
                     {
-                        int lineNumber = dataGridView1.CurrentCell.RowIndex + 1;
+                        int lineNumber = dataGridViewTasks.CurrentCell.RowIndex + 1;
 
-                        googleHelper.SetTasks(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", listOfTasks[index].Task, listOfTasks[index].Status.ToString(), listOfTasks[index].Category, listOfTasks[index].Time, listOfTasks[index].TimeUpdate);
+                        googleHelper.SetTasks(
+                            cellName1: $"A{lineNumber}", cellName2: $"F{lineNumber}", listOfTasks[index].Task,
+                            listOfTasks[index].Status.ToString(), listOfTasks[index].Category,
+                            listOfTasks[index].Time, listOfTasks[index].TimeUpdate, listOfTasks[index].IsDeleted.ToString());
                     }
 
                     RemoveWhiteSpace();
@@ -198,30 +212,18 @@ namespace Snowfall
             }
         }
 
-        private async void RefreshListAsync()
-        {
-            if (successConnect == true)
-            {
-                listOfTasksGDrive.Clear();
-                LoadDataFromGDrive();
-                listOfTasks.Clear();
-                listOfTasks = listOfTasksGDrive;
-                await Task.Run(() => FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks));
-            }
-        }
-
         private void OrderByFalse()
         {
             var filteredTasks = listOfTasks.Where(b => b.Status == false).ToList();
             category = new BindingList<TaskBody>(filteredTasks);
-            dataGridView1.DataSource = category;
+            dataGridViewTasks.DataSource = category;
         }
 
         private void OrderByTrue()
         {
             var filteredTasks = listOfTasks.Where(b => b.Status == true).ToList();
             category = new BindingList<TaskBody>(filteredTasks);
-            dataGridView1.DataSource = category;
+            dataGridViewTasks.DataSource = category;
         }
 
         # region [Theme]
@@ -232,10 +234,10 @@ namespace Snowfall
 
         private void ColumnsConfig()
         {
-            dataGridView1.Columns[0].Width = 450;
-            dataGridView1.Columns[1].Width = 50;
-            dataGridView1.Columns[2].Width = 100;
-            dataGridView1.Columns[3].Width = 160;
+            dataGridViewTasks.Columns[0].Width = 460;
+            dataGridViewTasks.Columns[1].Width = 50;
+            dataGridViewTasks.Columns[2].Width = 100;
+            dataGridViewTasks.Columns[3].Width = 160;
         }
 
         private Color SelectThemeColor()
@@ -359,7 +361,8 @@ namespace Snowfall
         {
             if (e.KeyCode == Keys.F5)
             {
-                RefreshListAsync();
+                listOfTasks.Clear();
+                LoadAndSortData();
             }
         }
 
@@ -369,20 +372,16 @@ namespace Snowfall
             {
                 if (e.RowIndex >= 0)
                 {
-                    DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-
-                    if (!row.Selected)
+                    DataGridViewCell c = (sender as DataGridView)[e.ColumnIndex, e.RowIndex];
+                    if (!c.Selected)
                     {
-                        dataGridView1.ClearSelection();
-
-                        foreach (DataGridViewCell cell in row.Cells)
-                        {
-                            cell.Selected = true;
-                        }
-
-                        Point cursorPosition = dataGridView1.PointToClient(Control.MousePosition);
-                        contextMenu.Show(dataGridView1, cursorPosition);
+                        c.DataGridView.ClearSelection();
+                        c.DataGridView.CurrentCell = c;
+                        c.Selected = true;
                     }
+
+                    Point cursorPosition = dataGridViewTasks.PointToClient(Control.MousePosition);
+                    contextMenu.Show(dataGridViewTasks, cursorPosition);
                 }
             }
         }
@@ -391,7 +390,7 @@ namespace Snowfall
         {
             if (categoryFlag == true)
             {
-                int index = dataGridView1.CurrentCell.RowIndex;
+                int index = dataGridViewTasks.CurrentCell.RowIndex;
                 string searchTask = category[index].Task;
                 int generalIndex = 0;
 
@@ -403,23 +402,56 @@ namespace Snowfall
                         break;
                     }
                 }
-                category.RemoveAt(index);
-                listOfTasks.RemoveAt(generalIndex);
-                googleHelper.DeleteRowOfTask(generalIndex);
+
+                listOfTasks[generalIndex].IsDeleted = true;
+
+                if (successConnect == true)
+                {
+                    int lineNumber = generalIndex + 1;
+
+                    googleHelper.SetTasks(
+                        cellName1: $"A{lineNumber}", cellName2: $"F{lineNumber}", listOfTasks[generalIndex].Task,
+                        listOfTasks[generalIndex].Status.ToString(), listOfTasks[generalIndex].Category,
+                        listOfTasks[generalIndex].Time, listOfTasks[generalIndex].TimeUpdate, listOfTasks[generalIndex].IsDeleted.ToString());
+                }
+
                 FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
+
+                FilterTasks();
+
+                if (categorySortByTrue = true)
+                {
+                    OrderByTrue();
+                }
+                else
+                {
+                    OrderByFalse();
+                }
             }
             else
             {
-                int index = dataGridView1.CurrentCell.RowIndex;
-                listOfTasks.RemoveAt(index);
-                googleHelper.DeleteRowOfTask(index);
+                int index = dataGridViewTasks.CurrentCell.RowIndex;
+                listOfTasks[index].IsDeleted = true;
+
+                if (successConnect == true)
+                {
+                    int lineNumber = index + 1;
+
+                    googleHelper.SetTasks(
+                        cellName1: $"A{lineNumber}", cellName2: $"F{lineNumber}", listOfTasks[index].Task,
+                        listOfTasks[index].Status.ToString(), listOfTasks[index].Category,
+                        listOfTasks[index].Time, listOfTasks[index].TimeUpdate, listOfTasks[index].IsDeleted.ToString());
+                }
+
                 FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
+
+                FilterTasks();
             }
         }
 
         private void ButtonAll_Click(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = listOfTasks;
+            dataGridViewTasks.DataSource = listOfTasks;
             categoryFlag = false;
         }
 
@@ -427,12 +459,14 @@ namespace Snowfall
         {
             OrderByTrue();
             categoryFlag = true;
+            categorySortByTrue = true;
         }
 
         private void ButtonFalse_Click(object sender, EventArgs e)
         {
             OrderByFalse();
             categoryFlag = true;
+            categorySortByTrue = false;
         }
 
     }

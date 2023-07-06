@@ -12,10 +12,7 @@ namespace Snowfall.Service
             if (!fileExists)
             {
                 File.CreateText(pathOfTasks).Dispose();
-                return new BindingList<TaskBody>
-                {
-
-                };
+                return new BindingList<TaskBody> { };
             }
             using (var reader = File.OpenText(pathOfTasks))
             {
@@ -39,10 +36,7 @@ namespace Snowfall.Service
             if (!fileExists)
             {
                 File.CreateText(pathOfNotes).Dispose();
-                return new BindingList<NoteBody>
-                {
-
-                };
+                return new BindingList<NoteBody> { };
             }
             using (var reader = File.OpenText(pathOfNotes))
             {

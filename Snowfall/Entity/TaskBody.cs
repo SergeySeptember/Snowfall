@@ -4,11 +4,17 @@ namespace Snowfall.Entity
 {
     public class TaskBody
     {
+        public TaskBody()
+        {
+            _time = _timeUpdate = DateTime.Now.ToString();
+        }
+
         private string _task;
         private bool _status;
         private string _category;
-        private string _time = DateTime.Now.ToString();
-        private string _timeUpdate = DateTime.Now.ToString();
+        private string _time;
+        private string _timeUpdate;
+        private bool _isDeleted;
 
         public string Task
         {
@@ -53,6 +59,16 @@ namespace Snowfall.Entity
             set
             {
                 _timeUpdate = value;
+            }
+        }
+
+        [Browsable(false)]
+        public bool IsDeleted
+        {
+            get => _isDeleted;
+            set
+            {
+                _isDeleted = value;
             }
         }
     }
