@@ -45,7 +45,7 @@
             buttonFalse = new Button();
             buttonTrue = new Button();
             panelDesktop = new Panel();
-            dataGridView1 = new DataGridView();
+            dataGridViewTasks = new DataGridView();
             contextMenu = new ContextMenuStrip(components);
             deleteToolStripMenuItem = new ToolStripMenuItem();
             toolTipAll = new ToolTip(components);
@@ -56,7 +56,7 @@
             panelLogo.SuspendLayout();
             panelTitleBar.SuspendLayout();
             panelDesktop.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewTasks).BeginInit();
             contextMenu.SuspendLayout();
             SuspendLayout();
             // 
@@ -228,7 +228,7 @@
             // 
             // panelDesktop
             // 
-            panelDesktop.Controls.Add(dataGridView1);
+            panelDesktop.Controls.Add(dataGridViewTasks);
             panelDesktop.Dock = DockStyle.Fill;
             panelDesktop.Location = new Point(217, 50);
             panelDesktop.Name = "panelDesktop";
@@ -237,9 +237,9 @@
             // 
             // dataGridView1
             // 
-            dataGridView1.BackgroundColor = SystemColors.ControlLightLight;
-            dataGridView1.BorderStyle = BorderStyle.None;
-            dataGridView1.CellBorderStyle = DataGridViewCellBorderStyle.None;
+            dataGridViewTasks.BackgroundColor = SystemColors.ControlLightLight;
+            dataGridViewTasks.BorderStyle = BorderStyle.None;
+            dataGridViewTasks.CellBorderStyle = DataGridViewCellBorderStyle.None;
             dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.TopCenter;
             dataGridViewCellStyle1.BackColor = SystemColors.Control;
             dataGridViewCellStyle1.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
@@ -247,8 +247,8 @@
             dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(0, 150, 136);
             dataGridViewCellStyle1.SelectionForeColor = SystemColors.WindowText;
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewTasks.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewTasks.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = SystemColors.Window;
             dataGridViewCellStyle2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
@@ -256,18 +256,18 @@
             dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(0, 150, 136);
             dataGridViewCellStyle2.SelectionForeColor = SystemColors.ControlText;
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
-            dataGridView1.DefaultCellStyle = dataGridViewCellStyle2;
-            dataGridView1.Dock = DockStyle.Fill;
-            dataGridView1.Location = new Point(0, 0);
-            dataGridView1.Name = "dataGridView1";
-            dataGridView1.RowHeadersVisible = false;
-            dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.ScrollBars = ScrollBars.Vertical;
-            dataGridView1.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            dataGridView1.Size = new Size(767, 511);
-            dataGridView1.TabIndex = 12;
-            dataGridView1.CellEndEdit += SaveCellEdit;
-            dataGridView1.CellMouseDown += DataGridView1_CellMouseDown;
+            dataGridViewTasks.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewTasks.Dock = DockStyle.Fill;
+            dataGridViewTasks.Location = new Point(0, 0);
+            dataGridViewTasks.Name = "dataGridView1";
+            dataGridViewTasks.RowHeadersVisible = false;
+            dataGridViewTasks.RowTemplate.Height = 25;
+            dataGridViewTasks.ScrollBars = ScrollBars.Vertical;
+            dataGridViewTasks.SelectionMode = DataGridViewSelectionMode.CellSelect;
+            dataGridViewTasks.Size = new Size(767, 511);
+            dataGridViewTasks.TabIndex = 12;
+            dataGridViewTasks.CellEndEdit += SaveCellEdit;
+            dataGridViewTasks.CellMouseDown += DataGridView1_CellMouseDown;
             // 
             // contextMenu
             // 
@@ -312,7 +312,7 @@
             panelLogo.PerformLayout();
             panelTitleBar.ResumeLayout(false);
             panelDesktop.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewTasks).EndInit();
             contextMenu.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -327,7 +327,7 @@
         private Panel panelDesktop;
         private Button buttonSettings;
         private Button buttonClose;
-        private DataGridView dataGridView1;
+        private DataGridView dataGridViewTasks;
         private ContextMenuStrip contextMenu;
         private ToolStripMenuItem deleteToolStripMenuItem;
         private Button buttonAll;
