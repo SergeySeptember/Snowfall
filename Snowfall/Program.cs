@@ -17,7 +17,7 @@ namespace Snowfall
 
         private static void Exception(object sender, ThreadExceptionEventArgs e)
         {
-            MessageBox.Show(e.Exception.ToString());
+            MessageBox.Show("Если видишь это окно, сделай скрин и скниь горе-разрабу\n" + e.Exception.ToString());
         }
     }
 }

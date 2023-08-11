@@ -9,14 +9,12 @@ namespace Snowfall.Forms
         public GoogleHelper secondGoogleHelper;
         BindingList<NoteBody> listOfNotes = new BindingList<NoteBody>();
         private bool successConnect;
-        private string pathOfNotes;
 
-        public FormNotes(GoogleHelper googleHelper, BindingList<NoteBody> listOfNotes, bool successConnect, string pathOfNotes)
+        public FormNotes(GoogleHelper googleHelper, BindingList<NoteBody> listOfNotes, bool successConnect)
         {
             secondGoogleHelper = googleHelper;
             this.listOfNotes = listOfNotes;
             this.successConnect = successConnect;
-            this.pathOfNotes = pathOfNotes;
 
             InitializeComponent();
             LoadNotes();
@@ -67,7 +65,7 @@ namespace Snowfall.Forms
                     secondGoogleHelper.SetNotes(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", listOfNotes[index].NoteName, listOfNotes[index].Description);
                 }
 
-                FileIOService.SaveNotesToJson(listOfNotes, pathOfNotes);
+                FileIOService.SaveNotesToJson(listOfNotes);
             }
         }
 
@@ -100,7 +98,7 @@ namespace Snowfall.Forms
             int index = dataGridViewNotes.CurrentCell.RowIndex;
             listOfNotes.RemoveAt(index);
             secondGoogleHelper.DeleteRowOfNotes(index);
-            FileIOService.SaveNotesToJson(listOfNotes, pathOfNotes);
+            FileIOService.SaveNotesToJson(listOfNotes);
         }
     }
 }

@@ -113,10 +113,10 @@ namespace Snowfall
             return true;
         }
 
-        public void SetTasks(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5, string value6)
+        public void SetTasks(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5, string value6, string value7)
         {
                 var range = this.sheetName + "!" + cellName1 + ":" + cellName2;
-                var values = new List<List<object>> { new List<object> { value1, value2, value3, value4, value5, value6 } };
+                var values = new List<List<object>> { new List<object> { value1, value2, value3, value4, value5, value6, value7 } };
 
                 var request = this.sheetService.Spreadsheets.Values.Update(
                     new ValueRange { Values = new List<IList<object>>(values) },
@@ -143,12 +143,13 @@ namespace Snowfall
             {
                 TaskBody taskBody = new TaskBody();
 
-                taskBody.Task = response.Values[i][0].ToString();
-                taskBody.Status = Convert.ToBoolean(response.Values[i][1]);
-                taskBody.Category = response.Values[i][2].ToString();
-                taskBody.Time = response.Values[i][3].ToString();
-                taskBody.TimeUpdate = response.Values[i][4].ToString();
-                taskBody.IsDeleted = Convert.ToBoolean(response.Values[i][5]);
+                taskBody.Id = response.Values[i][0].ToString();
+                taskBody.Task = response.Values[i][1].ToString();
+                taskBody.Status = Convert.ToBoolean(response.Values[i][2]);
+                taskBody.Category = response.Values[i][3].ToString();
+                taskBody.Time = response.Values[i][4].ToString();
+                taskBody.TimeUpdate = response.Values[i][5].ToString();
+                taskBody.IsDeleted = Convert.ToBoolean(response.Values[i][6]);
 
                 resultList.Add(taskBody);
             }

@@ -4,9 +4,12 @@ using System.ComponentModel;
 
 namespace Snowfall.Service
 {
-    public class FileIOService
+    public static class FileIOService
     {
-        public static BindingList<TaskBody> LoadTasksFromJson(string pathOfTasks)
+        private static string pathOfTasks = $"{Environment.CurrentDirectory}\\ListOfTasks.json";
+        private static string pathOfNotes = $"{Environment.CurrentDirectory}\\ListOfNotes.json";
+
+        public static BindingList<TaskBody> LoadTasksFromJson()
         {
             var fileExists = File.Exists(pathOfTasks);
             if (!fileExists)
@@ -21,7 +24,7 @@ namespace Snowfall.Service
             }
         }
 
-        public static void SaveTaskToJson(object listOfCases, string pathOfTasks)
+        public static void SaveTaskToJson(object listOfCases)
         {
             using (StreamWriter writer = File.CreateText(pathOfTasks))
             {
@@ -30,7 +33,7 @@ namespace Snowfall.Service
             }
         }
 
-        public static BindingList<NoteBody> LoadNotesFromJson(string pathOfNotes)
+        public static BindingList<NoteBody> LoadNotesFromJson()
         {
             var fileExists = File.Exists(pathOfNotes);
             if (!fileExists)
@@ -45,7 +48,7 @@ namespace Snowfall.Service
             }
         }
 
-        public static void SaveNotesToJson(object listOfNotes, string pathOfNotes)
+        public static void SaveNotesToJson(object listOfNotes)
         {
             using (StreamWriter writer = File.CreateText(pathOfNotes))
             {

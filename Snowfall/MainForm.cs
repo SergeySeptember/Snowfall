@@ -1,6 +1,8 @@
 using Snowfall.Entity;
 using Snowfall.Forms;
 using Snowfall.Service;
+using Snowfall.Service.ActionWithNotes;
+using Snowfall.Service.ActionWithTasks;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
@@ -9,10 +11,9 @@ namespace Snowfall
     public partial class MainForm : Form
     {
         public GoogleHelper googleHelper;
-        private string[] token = File.ReadAllLines($"{Environment.CurrentDirectory}\\ListOfTasks.json");
+        //private string[] token = File.ReadAllLines($"{Environment.CurrentDirectory}\\token.json");
+        private string[] token = File.ReadAllLines($"C:\\token.json");
         private string todoSheet = "Snowfall";
-        private string pathOfTasks = $"{Environment.CurrentDirectory}\\ListOfTasks.json";
-        private string pathOfNotes = $"{Environment.CurrentDirectory}\\ListOfNotes.json";
         private bool successConnect = true;
         private bool categoryFlag = false;
         private bool categorySortByTrue = false;
@@ -20,12 +21,13 @@ namespace Snowfall
         private Form activeForm;
         public FormNotes formNotes;
 
-        private BindingList<TaskBody> listOfTasksGDrive = new BindingList<TaskBody>();
-        private BindingList<TaskBody> listOfTasksJSON = new BindingList<TaskBody>();
-        private BindingList<TaskBody> listOfTasks = new BindingList<TaskBody>();
-        private BindingList<TaskBody> category = new BindingList<TaskBody>();
+        private IOTasks iOTasks;
+        private IONotes iONotes;
+        private TaskProcessing taskProcessing = new();
 
-        BindingList<NoteBody> listOfNotes = new BindingList<NoteBody>();
+        public BindingList<TaskBody> listOfTasks = new BindingList<TaskBody>();
+        public BindingList<TaskBody> category = new BindingList<TaskBody>();
+        public BindingList<NoteBody> listOfNotes = new BindingList<NoteBody>();
 
         public MainForm()
         {
@@ -41,196 +43,155 @@ namespace Snowfall
         private async Task InitialLoad()
         {
             googleHelper = new GoogleHelper(token[0], todoSheet);
+            iOTasks = new IOTasks(googleHelper);
+            iONotes = new IONotes(googleHelper);
 
             try
             {
                 successConnect = await googleHelper.Start();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 successConnect = false;
             }
 
             if (successConnect == true)
             {
-                int count = googleHelper.GetCountOfNotes();
-
-                LoadAndSortData();
-
-                listOfNotes = googleHelper.GetNotes(cellName: $"A{1}", cellName2: $"B{count}");
-                FileIOService.SaveNotesToJson(listOfNotes, pathOfNotes);
+                listOfTasks = iOTasks.LoadAndSortTasks();
+                dataGridViewTasks.DataSource = listOfTasks;
+                listOfNotes = iONotes.LoadAndSortNotes();
 
                 labelOnline.Text = "Online";
             }
             else
             {
-                GetTasksFromJson();
-                dataGridViewTasks.DataSource = listOfTasksJSON;
-                GetNotesFromJsons();
+                listOfTasks = iOTasks.GetTasksFromJson();
+                dataGridViewTasks.DataSource = listOfTasks;
+                listOfNotes = iONotes.GetNotesFromJsons();
+
                 labelOnline.Text = "Offline";
             }
-
         }
 
-        private void GetTasksFromGDrive()
-        {
-            int countOfRawOnGDrive = googleHelper.GetCountOfTasks();
-            if (countOfRawOnGDrive != 0)
-            {
-                listOfTasksGDrive = googleHelper.GetTasks(cellName: $"A{1}", cellName2: $"F{countOfRawOnGDrive}");
-            }
-        }
-
-        private void LoadAndSortData()
-        {
-            GetTasksFromGDrive();
-            GetTasksFromJson();
-
-            int countOfRawJson = listOfTasksJSON.Count;
-            int countOfRawGDrive = listOfTasksGDrive.Count;
-
-            int minCount = Math.Min(countOfRawJson, countOfRawGDrive);
-
-            for (int i = 0; i < minCount; i++)
-            {
-                var time1 = DateTime.Parse(listOfTasksJSON[i].TimeUpdate);
-                var time2 = DateTime.Parse(listOfTasksGDrive[i].TimeUpdate);
-
-                if (time1 > time2)
-                {
-                    listOfTasks.Add(listOfTasksJSON[i]);
-                }
-                else
-                {
-                    listOfTasks.Add(listOfTasksGDrive[i]);
-                }
-            }
-
-            for (int i = minCount; i < countOfRawJson; i++)
-            {
-                listOfTasks.Add(listOfTasksJSON[i]);
-            }
-
-            for (int i = minCount; i < countOfRawGDrive; i++)
-            {
-                listOfTasks.Add(listOfTasksGDrive[i]);
-            }
-
-            FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
-
-            FilterTasks();
-        }
-
-        private void FilterTasks()
-        {
-            var filteredTasks = listOfTasks.Where(b => b.IsDeleted == false).ToList();
-            listOfTasks = new BindingList<TaskBody>(filteredTasks);
-            dataGridViewTasks.DataSource = listOfTasks;
-        }
-
-        private void GetTasksFromJson()
-        {
-            listOfTasksJSON = FileIOService.LoadTasksFromJson(pathOfTasks);
-        }
-
-        private void GetNotesFromJsons()
-        {
-            listOfNotes = FileIOService.LoadNotesFromJson(pathOfNotes);
-        }
-        // todo сделать метод, заносит изменения в таблицу. Номер линии не из датагрид, а индексу листа +1
+        #region [Events]
         private void SaveCellEdit(object sender, DataGridViewCellEventArgs e)
         {
-            if (categoryFlag == true)
+            if (categoryFlag)
             {
-                int index = dataGridViewTasks.CurrentCell.RowIndex;
-
-                if (category.Count > index && !string.IsNullOrWhiteSpace(category[index].Task))
-                {
-                    string searchTask = category[index].Task;
-                    int generalIndex = 0;
-
-                    for (int i = 0; i < listOfTasks.Count; i++)
-                    {
-                        if (listOfTasks[i].Task == searchTask)
-                        {
-                            generalIndex = i;
-                            break;
-                        }
-                    }
-
-                    listOfTasks[generalIndex].TimeUpdate = DateTime.Now.ToString();
-
-                    if (successConnect == true)
-                    {
-                        int lineNumber = generalIndex + 1;
-
-                        googleHelper.SetTasks(
-                            cellName1: $"A{lineNumber}", cellName2: $"F{lineNumber}", listOfTasks[generalIndex].Task,
-                            listOfTasks[generalIndex].Status.ToString(), listOfTasks[generalIndex].Category,
-                            listOfTasks[generalIndex].Time, listOfTasks[generalIndex].TimeUpdate, listOfTasks[generalIndex].IsDeleted.ToString());
-                    }
-
-                    RemoveWhiteSpace();
-
-                    FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
-                }
-
+                iOTasks.SaveCellEditByCategory(successConnect, dataGridViewTasks.CurrentCell.RowIndex, category, listOfTasks);
             }
             else
             {
-                int index = dataGridViewTasks.CurrentCell.RowIndex;
+                iOTasks.SaveCellEdit(successConnect, dataGridViewTasks.CurrentCell.RowIndex, listOfTasks);
+            }
+        }
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F5)
+            {
+                listOfTasks.Clear();
+                listOfTasks = iOTasks.LoadAndSortTasks();
+                dataGridViewTasks.DataSource = listOfTasks;
+            }
+        }
 
-                if (listOfTasks.Count > index && !string.IsNullOrWhiteSpace(listOfTasks[index].Task))
+        private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (categoryFlag == true)
+            {
+                category = iOTasks.DeleteTaskInCategory(dataGridViewTasks.CurrentCell.RowIndex, listOfTasks, category, successConnect, categorySortByTrue);
+                dataGridViewTasks.DataSource = category;
+            }
+            else
+            {
+                dataGridViewTasks.DataSource = iOTasks.DeleteTask(dataGridViewTasks.CurrentCell.RowIndex, listOfTasks, successConnect);
+            }
+        }
+
+        private void DataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.ColumnIndex != -1 && e.RowIndex != -1 && e.Button == MouseButtons.Right)
+            {
+                if (e.RowIndex >= 0)
                 {
-                    listOfTasks[index].TimeUpdate = DateTime.Now.ToString();
-
-                    if (successConnect == true)
+                    DataGridViewCell c = (sender as DataGridView)[e.ColumnIndex, e.RowIndex];
+                    if (!c.Selected)
                     {
-                        int lineNumber = dataGridViewTasks.CurrentCell.RowIndex + 1;
-
-                        googleHelper.SetTasks(
-                            cellName1: $"A{lineNumber}", cellName2: $"F{lineNumber}", listOfTasks[index].Task,
-                            listOfTasks[index].Status.ToString(), listOfTasks[index].Category,
-                            listOfTasks[index].Time, listOfTasks[index].TimeUpdate, listOfTasks[index].IsDeleted.ToString());
+                        c.DataGridView.ClearSelection();
+                        c.DataGridView.CurrentCell = c;
+                        c.Selected = true;
                     }
 
-                    RemoveWhiteSpace();
-
-                    FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
+                    Point cursorPosition = dataGridViewTasks.PointToClient(Control.MousePosition);
+                    contextMenu.Show(dataGridViewTasks, cursorPosition);
                 }
             }
         }
 
-        private void RemoveWhiteSpace()
+        private void ButtonList_Click(object sender, EventArgs e)
         {
-            for (int i = listOfTasks.Count - 1; i >= 0; i--)
-            {
-                if (string.IsNullOrWhiteSpace(listOfTasks[i].Task))
-                {
-                    listOfTasks.RemoveAt(i);
-                }
-            }
+            if (activeForm != null)
+                activeForm.Close();
+            Reset();
+            ActivateButton(sender);
+            buttonAll.Visible = true;
+            buttonTrue.Visible = true;
+            buttonFalse.Visible = true;
         }
 
-        private void OrderByFalse()
+        private void ButtonNote_Click(object sender, EventArgs e)
         {
-            var filteredTasks = listOfTasks.Where(b => b.Status == false).ToList();
-            category = new BindingList<TaskBody>(filteredTasks);
-            dataGridViewTasks.DataSource = category;
+            OpenChildForm(new FormNotes(googleHelper, listOfNotes, successConnect), sender);
+            buttonAll.Visible = false;
+            buttonTrue.Visible = false;
+            buttonFalse.Visible = false;
         }
 
-        private void OrderByTrue()
+        private void ButtonSettings_Click(object sender, EventArgs e)
         {
-            var filteredTasks = listOfTasks.Where(b => b.Status == true).ToList();
-            category = new BindingList<TaskBody>(filteredTasks);
-            dataGridViewTasks.DataSource = category;
+            OpenChildForm(new FormSettings(), sender);
+            buttonAll.Visible = false;
+            buttonTrue.Visible = false;
+            buttonFalse.Visible = false;
         }
+        private void ButtonAll_Click(object sender, EventArgs e)
+        {
+            dataGridViewTasks.DataSource = listOfTasks;
+            categoryFlag = false;
+        }
+
+        public void ButtonTrue_Click(object sender, EventArgs e)
+        {
+            category = taskProcessing.OrderByTrue(listOfTasks);
+            dataGridViewTasks.DataSource = category;
+            categoryFlag = true;
+            categorySortByTrue = true;
+        }
+
+        private void ButtonFalse_Click(object sender, EventArgs e)
+        {
+            category = taskProcessing.OrderByFalse(listOfTasks);
+            dataGridViewTasks.DataSource = category;
+            categoryFlag = true;
+            categorySortByTrue = false;
+        }
+
+        private void ButtonClose_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void ButtonMin_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+        #endregion
 
         # region [Theme]
         [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
         private extern static void ReleaseCapture();
         [DllImport("user32.DLL", EntryPoint = "SendMessage")]
-        private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
+        private extern static void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
 
         private void ColumnsConfig()
         {
@@ -321,153 +282,5 @@ namespace Snowfall
             SendMessage(this.Handle, 0x112, 0xf012, 0);
         }
         #endregion
-
-        private void ButtonList_Click(object sender, EventArgs e)
-        {
-            if (activeForm != null)
-                activeForm.Close();
-            Reset();
-            ActivateButton(sender);
-            buttonAll.Visible = true;
-            buttonTrue.Visible = true;
-            buttonFalse.Visible = true;
-        }
-
-        private void ButtonNote_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new FormNotes(googleHelper, listOfNotes, successConnect, pathOfNotes), sender);
-            buttonAll.Visible = false;
-            buttonTrue.Visible = false;
-            buttonFalse.Visible = false;
-        }
-        private void ButtonSettings_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new Forms.FormSettings(), sender);
-            buttonAll.Visible = false;
-            buttonTrue.Visible = false;
-            buttonFalse.Visible = false;
-        }
-        private void ButtonClose_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void ButtonMin_Click(object sender, EventArgs e)
-        {
-            WindowState = FormWindowState.Minimized;
-        }
-
-        private void MainForm_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.F5)
-            {
-                listOfTasks.Clear();
-                LoadAndSortData();
-            }
-        }
-
-        private void DataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            if (e.ColumnIndex != -1 && e.RowIndex != -1 && e.Button == MouseButtons.Right)
-            {
-                if (e.RowIndex >= 0)
-                {
-                    DataGridViewCell c = (sender as DataGridView)[e.ColumnIndex, e.RowIndex];
-                    if (!c.Selected)
-                    {
-                        c.DataGridView.ClearSelection();
-                        c.DataGridView.CurrentCell = c;
-                        c.Selected = true;
-                    }
-
-                    Point cursorPosition = dataGridViewTasks.PointToClient(Control.MousePosition);
-                    contextMenu.Show(dataGridViewTasks, cursorPosition);
-                }
-            }
-        }
-
-        private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (categoryFlag == true)
-            {
-                int index = dataGridViewTasks.CurrentCell.RowIndex;
-                string searchTask = category[index].Task;
-                int generalIndex = 0;
-
-                for (int i = 0; i < listOfTasks.Count; i++)
-                {
-                    if (listOfTasks[i].Task == searchTask)
-                    {
-                        generalIndex = i;
-                        break;
-                    }
-                }
-
-                listOfTasks[generalIndex].IsDeleted = true;
-
-                if (successConnect == true)
-                {
-                    int lineNumber = generalIndex + 1;
-
-                    googleHelper.SetTasks(
-                        cellName1: $"A{lineNumber}", cellName2: $"F{lineNumber}", listOfTasks[generalIndex].Task,
-                        listOfTasks[generalIndex].Status.ToString(), listOfTasks[generalIndex].Category,
-                        listOfTasks[generalIndex].Time, listOfTasks[generalIndex].TimeUpdate, listOfTasks[generalIndex].IsDeleted.ToString());
-                }
-
-                FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
-
-                FilterTasks();
-
-                if (categorySortByTrue = true)
-                {
-                    OrderByTrue();
-                }
-                else
-                {
-                    OrderByFalse();
-                }
-            }
-            else
-            {
-                int index = dataGridViewTasks.CurrentCell.RowIndex;
-                listOfTasks[index].IsDeleted = true;
-
-                if (successConnect == true)
-                {
-                    int lineNumber = index + 1;
-
-                    googleHelper.SetTasks(
-                        cellName1: $"A{lineNumber}", cellName2: $"F{lineNumber}", listOfTasks[index].Task,
-                        listOfTasks[index].Status.ToString(), listOfTasks[index].Category,
-                        listOfTasks[index].Time, listOfTasks[index].TimeUpdate, listOfTasks[index].IsDeleted.ToString());
-                }
-
-                FileIOService.SaveTaskToJson(listOfTasks, pathOfTasks);
-
-                FilterTasks();
-            }
-        }
-
-        private void ButtonAll_Click(object sender, EventArgs e)
-        {
-            dataGridViewTasks.DataSource = listOfTasks;
-            categoryFlag = false;
-        }
-
-        private void ButtonTrue_Click(object sender, EventArgs e)
-        {
-            OrderByTrue();
-            categoryFlag = true;
-            categorySortByTrue = true;
-        }
-
-        private void ButtonFalse_Click(object sender, EventArgs e)
-        {
-            OrderByFalse();
-            categoryFlag = true;
-            categorySortByTrue = false;
-        }
-
     }
 }
