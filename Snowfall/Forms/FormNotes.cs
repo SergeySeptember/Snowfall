@@ -1,5 +1,6 @@
 ﻿using Snowfall.Entity;
 using Snowfall.Service;
+using System;
 using System.ComponentModel;
 
 namespace Snowfall.Forms
@@ -9,8 +10,8 @@ namespace Snowfall.Forms
         public GoogleHelper secondGoogleHelper;
         BindingList<NoteBody> listOfNotes = new BindingList<NoteBody>();
         private bool successConnect;
-
-        public FormNotes(GoogleHelper googleHelper, BindingList<NoteBody> listOfNotes, bool successConnect)
+        private bool expection = false;
+        public FormNotes(GoogleHelper googleHelper, BindingList<NoteBody> listOfNotes, bool successConnect, bool languageRus)
         {
             secondGoogleHelper = googleHelper;
             this.listOfNotes = listOfNotes;
@@ -18,8 +19,17 @@ namespace Snowfall.Forms
 
             InitializeComponent();
             LoadNotes();
-            dataGridViewNotes.Columns[0].Width = 179;
 
+            dataGridViewNotes.Columns[0].Width = 179;
+            dataGridViewNotes.Columns[0].Name = "Давай";
+            //if (languageRus)
+            //{
+            //    dataGridViewNotes.Columns[0].Name = "Заметки";
+            //}
+            //else
+            //{
+            //    dataGridViewNotes.Columns[0].Name = "Notes";
+            //}
         }
 
         public void LoadNotes()
@@ -99,6 +109,30 @@ namespace Snowfall.Forms
             listOfNotes.RemoveAt(index);
             secondGoogleHelper.DeleteRowOfNotes(index);
             FileIOService.SaveNotesToJson(listOfNotes);
+        }
+
+        private async void dataGridViewNotes_MouseEnter(object sender, EventArgs e)
+        {
+            while (!expection && dataGridViewNotes.Location.X < textBoxBody.Location.X - 40)
+            {
+                expection = true;
+                await Task.Delay(1);
+                dataGridViewNotes.Location = new Point(dataGridViewNotes.Location.X + 10, dataGridViewNotes.Location.Y);
+                expection = false;
+            }
+            expection = false;
+        }
+
+        private async void dataGridViewNotes_MouseLeave(object sender, EventArgs e)
+        {
+            while (!expection && dataGridViewNotes.Location.X > -130)
+            {
+                expection = true;
+                await Task.Delay(1);
+                dataGridViewNotes.Location = new Point(dataGridViewNotes.Location.X - 20, dataGridViewNotes.Location.Y);
+                expection = false;
+            }
+            expection = false;
         }
     }
 }

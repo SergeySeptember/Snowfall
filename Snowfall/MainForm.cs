@@ -20,10 +20,11 @@ namespace Snowfall
         private Button currentButton;
         private Form activeForm;
         public FormNotes formNotes;
+        public bool languageRus = true;
 
         private IOTasks iOTasks;
         private IONotes iONotes;
-        private TaskProcessing taskProcessing = new();
+        private TaskProcessing _taskProcessing = new();
 
         public BindingList<TaskBody> listOfTasks = new BindingList<TaskBody>();
         public BindingList<TaskBody> category = new BindingList<TaskBody>();
@@ -141,7 +142,7 @@ namespace Snowfall
 
         private void ButtonNote_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new FormNotes(googleHelper, listOfNotes, successConnect), sender);
+            OpenChildForm(new FormNotes(googleHelper, listOfNotes, successConnect, languageRus), sender);
             buttonAll.Visible = false;
             buttonTrue.Visible = false;
             buttonFalse.Visible = false;
@@ -149,20 +150,21 @@ namespace Snowfall
 
         private void ButtonSettings_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new FormSettings(), sender);
+            OpenChildForm(new FormSettings(this), sender);
             buttonAll.Visible = false;
             buttonTrue.Visible = false;
             buttonFalse.Visible = false;
         }
         private void ButtonAll_Click(object sender, EventArgs e)
         {
-            dataGridViewTasks.DataSource = listOfTasks;
+
+            dataGridViewTasks.DataSource = _taskProcessing.FilterTasks(listOfTasks);
             categoryFlag = false;
         }
 
         public void ButtonTrue_Click(object sender, EventArgs e)
         {
-            category = taskProcessing.OrderByTrue(listOfTasks);
+            category = _taskProcessing.OrderByTrue(listOfTasks);
             dataGridViewTasks.DataSource = category;
             categoryFlag = true;
             categorySortByTrue = true;
@@ -170,7 +172,7 @@ namespace Snowfall
 
         private void ButtonFalse_Click(object sender, EventArgs e)
         {
-            category = taskProcessing.OrderByFalse(listOfTasks);
+            category = _taskProcessing.OrderByFalse(listOfTasks);
             dataGridViewTasks.DataSource = category;
             categoryFlag = true;
             categorySortByTrue = false;

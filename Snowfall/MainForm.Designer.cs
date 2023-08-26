@@ -33,6 +33,7 @@
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             panelMenu = new Panel();
+            labelOnline = new Label();
             buttonSettings = new Button();
             buttonNote = new Button();
             buttonList = new Button();
@@ -51,7 +52,6 @@
             toolTipAll = new ToolTip(components);
             toolTipTrue = new ToolTip(components);
             toolTipFalse = new ToolTip(components);
-            labelOnline = new Label();
             panelMenu.SuspendLayout();
             panelLogo.SuspendLayout();
             panelTitleBar.SuspendLayout();
@@ -74,6 +74,15 @@
             panelMenu.Size = new Size(217, 561);
             panelMenu.TabIndex = 13;
             panelMenu.MouseDown += PanelMenu_MouseDown;
+            // 
+            // labelOnline
+            // 
+            labelOnline.AutoSize = true;
+            labelOnline.Location = new Point(12, 537);
+            labelOnline.Name = "labelOnline";
+            labelOnline.Size = new Size(38, 15);
+            labelOnline.TabIndex = 4;
+            labelOnline.Text = "label1";
             // 
             // buttonSettings
             // 
@@ -235,7 +244,7 @@
             panelDesktop.Size = new Size(767, 511);
             panelDesktop.TabIndex = 15;
             // 
-            // dataGridView1
+            // dataGridViewTasks
             // 
             dataGridViewTasks.BackgroundColor = SystemColors.ControlLightLight;
             dataGridViewTasks.BorderStyle = BorderStyle.None;
@@ -259,7 +268,7 @@
             dataGridViewTasks.DefaultCellStyle = dataGridViewCellStyle2;
             dataGridViewTasks.Dock = DockStyle.Fill;
             dataGridViewTasks.Location = new Point(0, 0);
-            dataGridViewTasks.Name = "dataGridView1";
+            dataGridViewTasks.Name = "dataGridViewTasks";
             dataGridViewTasks.RowHeadersVisible = false;
             dataGridViewTasks.RowTemplate.Height = 25;
             dataGridViewTasks.ScrollBars = ScrollBars.Vertical;
@@ -281,15 +290,6 @@
             deleteToolStripMenuItem.Size = new Size(107, 22);
             deleteToolStripMenuItem.Text = "Delete";
             deleteToolStripMenuItem.Click += DeleteToolStripMenuItem_Click;
-            // 
-            // labelOnline
-            // 
-            labelOnline.AutoSize = true;
-            labelOnline.Location = new Point(12, 537);
-            labelOnline.Name = "labelOnline";
-            labelOnline.Size = new Size(38, 15);
-            labelOnline.TabIndex = 4;
-            labelOnline.Text = "label1";
             // 
             // MainForm
             // 
@@ -319,7 +319,6 @@
 
         #endregion
         private Panel panelMenu;
-        private Button buttonList;
         private Panel panelLogo;
         private Button buttonNote;
         private Panel panelTitleBar;
@@ -338,5 +337,6 @@
         private ToolTip toolTipFalse;
         private ToolTip toolTipTrue;
         private Label labelOnline;
+        public Button buttonList;
     }
 }

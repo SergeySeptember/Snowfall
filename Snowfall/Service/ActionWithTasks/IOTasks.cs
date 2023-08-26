@@ -92,11 +92,11 @@ namespace Snowfall.Service.ActionWithTasks
                         listOfTasks[index].Status.ToString(), listOfTasks[index].Category,
                         listOfTasks[index].Time, listOfTasks[index].TimeUpdate, listOfTasks[index].IsDeleted.ToString());
                 }
- 
+
                 FileIOService.SaveTaskToJson(listOfTasks);
             }
         }
-        // todo при добавлении новой таски в категории что-то нужно придумать!
+
         public void SaveCellEditByCategory(bool successConnect, int index, BindingList<TaskBody> category, BindingList<TaskBody> listOfTasks)
         {
             if (category.Count > index && !string.IsNullOrWhiteSpace(category[index].Task))
@@ -113,30 +113,67 @@ namespace Snowfall.Service.ActionWithTasks
                     }
                 }
 
-                listOfTasks[generalIndex].TimeUpdate = DateTime.Now.ToString();
+                bool tempFlag = false;
 
-                if (successConnect)
+                for (int i = 0; i < listOfTasks.Count; i++)
                 {
-                    int lineNumber = generalIndex + 1;
-
-                    _googleHelper.SetTasks(
-                        cellName1: $"A{lineNumber}", cellName2: $"G{lineNumber}", listOfTasks[generalIndex].Id.ToString(),
-                        listOfTasks[generalIndex].Task, listOfTasks[generalIndex].Status.ToString(), listOfTasks[generalIndex].Category,
-                        listOfTasks[generalIndex].Time, listOfTasks[generalIndex].TimeUpdate, listOfTasks[generalIndex].IsDeleted.ToString());
+                    if (category[index].Id == listOfTasks[i].Id)
+                    {
+                        tempFlag = true;
+                    }
                 }
 
-                FileIOService.SaveTaskToJson(listOfTasks);
+                if (tempFlag)
+                {
+                    listOfTasks[generalIndex].TimeUpdate = DateTime.Now.ToString();
+
+                    if (successConnect)
+                    {
+                        int lineNumber = generalIndex + 1;
+
+                        _googleHelper.SetTasks(
+                            cellName1: $"A{lineNumber}", cellName2: $"G{lineNumber}", listOfTasks[generalIndex].Id.ToString(),
+                            listOfTasks[generalIndex].Task, listOfTasks[generalIndex].Status.ToString(), listOfTasks[generalIndex].Category,
+                            listOfTasks[generalIndex].Time, listOfTasks[generalIndex].TimeUpdate, listOfTasks[generalIndex].IsDeleted.ToString());
+                    }
+
+                    FileIOService.SaveTaskToJson(listOfTasks);
+                }
+                else
+                {
+                    TaskBody addedBody = new TaskBody()
+                    {
+                        Task = category[index].Task,
+                        Status = category[index].Status,
+                        Category = category[index].Category,
+                    };
+
+                    listOfTasks.Add(addedBody);
+
+                    if (successConnect)
+                    {
+                        int lineNumber = listOfTasks.Count;
+                        int indexOfTask = listOfTasks.Count - 1;
+
+                        _googleHelper.SetTasks(
+                            cellName1: $"A{lineNumber}", cellName2: $"G{lineNumber}", listOfTasks[indexOfTask].Id.ToString(),
+                            listOfTasks[indexOfTask].Task, listOfTasks[indexOfTask].Status.ToString(), listOfTasks[indexOfTask].Category,
+                            listOfTasks[indexOfTask].Time, listOfTasks[indexOfTask].TimeUpdate, listOfTasks[indexOfTask].IsDeleted.ToString());
+                    }
+
+                    FileIOService.SaveTaskToJson(listOfTasks);
+                }
             }
         }
 
         public BindingList<TaskBody> DeleteTaskInCategory(int index, BindingList<TaskBody> listOfTasks, BindingList<TaskBody> category, bool successConnect, bool categorySortByTrue)
         {
-            string searchTask = category[index].Task;
+            string searchId = category[index].Id;
             int generalIndex = 0;
 
             for (int i = 0; i < listOfTasks.Count; i++)
             {
-                if (listOfTasks[i].Task == searchTask)
+                if (listOfTasks[i].Id == searchId)
                 {
                     generalIndex = i;
                     break;
@@ -144,6 +181,7 @@ namespace Snowfall.Service.ActionWithTasks
             }
 
             listOfTasks[generalIndex].IsDeleted = true;
+            listOfTasks[generalIndex].TimeUpdate = DateTime.Now.ToString();
 
             if (successConnect)
             {
@@ -157,7 +195,7 @@ namespace Snowfall.Service.ActionWithTasks
 
             FileIOService.SaveTaskToJson(listOfTasks);
 
-            _taskProcessing.FilterTasks(listOfTasks);
+            listOfTasks = _taskProcessing.FilterTasks(listOfTasks);
             if (categorySortByTrue)
             {
                 return _taskProcessing.OrderByTrue(listOfTasks);
@@ -171,6 +209,7 @@ namespace Snowfall.Service.ActionWithTasks
         public BindingList<TaskBody> DeleteTask(int index, BindingList<TaskBody> listOfTasks, bool successConnect)
         {
             listOfTasks[index].IsDeleted = true;
+            listOfTasks[index].TimeUpdate = DateTime.Now.ToString();
 
             if (successConnect)
             {
