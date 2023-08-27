@@ -24,14 +24,28 @@ namespace Snowfall.Forms
 
         private void PictureBoxRusClick(object sender, EventArgs e)
         {
+            mainForm.languageRus = true;
             labelMode.Text = ChangeLanguage.languagesRus["L/D Theme"];
+            labelColor.Text = ChangeLanguage.languagesRus["Change color"];
+            mainForm.buttonList.Text = ChangeLanguage.languagesRus["Todo List"];
+            mainForm.buttonNote.Text = ChangeLanguage.languagesRus["Notes"];
+            mainForm.buttonSettings.Text = ChangeLanguage.languagesRus["Settings"];
         }
 
         private void PictureBoxEngClick(object sender, EventArgs e)
         {
-            labelMode.Text = ChangeLanguage.languagesEng["L/D Theme"];
-            mainForm.buttonList.Text = "ToDo List";
             mainForm.languageRus = false;
+            labelMode.Text = ChangeLanguage.languagesEng["L/D Theme"];
+            labelColor.Text = ChangeLanguage.languagesEng["Change color"];
+            mainForm.buttonList.Text = ChangeLanguage.languagesEng["Todo List"];
+            mainForm.buttonNote.Text = ChangeLanguage.languagesEng["Notes"];
+            mainForm.buttonSettings.Text = ChangeLanguage.languagesEng["Settings"];
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

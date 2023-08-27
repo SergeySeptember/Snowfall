@@ -29,15 +29,16 @@
         private void InitializeComponent()
         {
             checkSwitch1 = new Service.CheckSwitch();
-            checkSwitch2 = new Service.CheckSwitch();
             labelMode = new Label();
-            label2 = new Label();
-            label3 = new Label();
+            labelPromo = new Label();
             pictureBoxRus = new PictureBox();
             pictureBoxEng = new PictureBox();
             labelChangeLang = new Label();
-            label5 = new Label();
+            labelColor = new Label();
             pictureBox1 = new PictureBox();
+            button1 = new Button();
+            button2 = new Button();
+            button3 = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBoxRus).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxEng).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -57,20 +58,6 @@
             checkSwitch1.TabIndex = 0;
             checkSwitch1.UseVisualStyleBackColor = true;
             // 
-            // checkSwitch2
-            // 
-            checkSwitch2.AutoSize = true;
-            checkSwitch2.Location = new Point(201, 52);
-            checkSwitch2.MinimumSize = new Size(45, 22);
-            checkSwitch2.Name = "checkSwitch2";
-            checkSwitch2.OffBackColor = Color.Gray;
-            checkSwitch2.OffToggleColor = Color.Gainsboro;
-            checkSwitch2.OnBackColor = Color.MediumSlateBlue;
-            checkSwitch2.OnToggleColor = Color.WhiteSmoke;
-            checkSwitch2.Size = new Size(45, 22);
-            checkSwitch2.TabIndex = 1;
-            checkSwitch2.UseVisualStyleBackColor = true;
-            // 
             // labelMode
             // 
             labelMode.AutoSize = true;
@@ -80,23 +67,14 @@
             labelMode.TabIndex = 2;
             labelMode.Text = "Светлая/тёмная тема";
             // 
-            // label2
+            // labelPromo
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(208, 25);
-            label2.Name = "label2";
-            label2.Size = new Size(38, 15);
-            label2.TabIndex = 3;
-            label2.Text = "label2";
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(73, 459);
-            label3.Name = "label3";
-            label3.Size = new Size(118, 30);
-            label3.TabIndex = 4;
-            label3.Text = "Snowfall 2023\r\nBy Sergey September";
+            labelPromo.AutoSize = true;
+            labelPromo.Location = new Point(73, 459);
+            labelPromo.Name = "labelPromo";
+            labelPromo.Size = new Size(118, 30);
+            labelPromo.TabIndex = 4;
+            labelPromo.Text = "Snowfall 2023\r\nBy Sergey September";
             // 
             // pictureBoxRus
             // 
@@ -112,7 +90,7 @@
             // pictureBoxEng
             // 
             pictureBoxEng.Image = Properties.Resources.eng;
-            pictureBoxEng.Location = new Point(99, 146);
+            pictureBoxEng.Location = new Point(103, 146);
             pictureBoxEng.Name = "pictureBoxEng";
             pictureBoxEng.Size = new Size(40, 40);
             pictureBoxEng.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -123,20 +101,20 @@
             // labelChangeLang
             // 
             labelChangeLang.AutoSize = true;
-            labelChangeLang.Location = new Point(47, 111);
+            labelChangeLang.Location = new Point(52, 110);
             labelChangeLang.Name = "labelChangeLang";
             labelChangeLang.Size = new Size(78, 15);
             labelChangeLang.TabIndex = 8;
             labelChangeLang.Text = "Смена языка";
             // 
-            // label5
+            // labelColor
             // 
-            label5.AutoSize = true;
-            label5.Location = new Point(358, 25);
-            label5.Name = "label5";
-            label5.Size = new Size(76, 15);
-            label5.TabIndex = 9;
-            label5.Text = "Выбор темы";
+            labelColor.AutoSize = true;
+            labelColor.Location = new Point(279, 25);
+            labelColor.Name = "labelColor";
+            labelColor.Size = new Size(76, 15);
+            labelColor.TabIndex = 9;
+            labelColor.Text = "Выбор темы";
             // 
             // pictureBox1
             // 
@@ -149,20 +127,49 @@
             pictureBox1.TabStop = false;
             pictureBox1.Click += pictureBox1_Click;
             // 
+            // button1
+            // 
+            button1.Location = new Point(265, 59);
+            button1.Name = "button1";
+            button1.Size = new Size(33, 23);
+            button1.TabIndex = 11;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
+            // button2
+            // 
+            button2.Location = new Point(304, 59);
+            button2.Name = "button2";
+            button2.Size = new Size(36, 23);
+            button2.TabIndex = 12;
+            button2.Text = "button2";
+            button2.UseVisualStyleBackColor = true;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(346, 59);
+            button3.Name = "button3";
+            button3.Size = new Size(38, 23);
+            button3.TabIndex = 13;
+            button3.Text = "button3";
+            button3.UseVisualStyleBackColor = true;
+            // 
             // FormSettings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(751, 508);
+            Controls.Add(button3);
+            Controls.Add(button2);
+            Controls.Add(button1);
             Controls.Add(pictureBox1);
-            Controls.Add(label5);
+            Controls.Add(labelColor);
             Controls.Add(labelChangeLang);
             Controls.Add(pictureBoxEng);
             Controls.Add(pictureBoxRus);
-            Controls.Add(label3);
-            Controls.Add(label2);
+            Controls.Add(labelPromo);
             Controls.Add(labelMode);
-            Controls.Add(checkSwitch2);
             Controls.Add(checkSwitch1);
             Name = "FormSettings";
             Text = "FormSettings";
@@ -176,14 +183,15 @@
         #endregion
 
         private Service.CheckSwitch checkSwitch1;
-        private Service.CheckSwitch checkSwitch2;
         private Label labelMode;
-        private Label label2;
-        private Label label3;
+        private Label labelPromo;
         private PictureBox pictureBoxRus;
         private PictureBox pictureBoxEng;
         private Label labelChangeLang;
-        private Label label5;
+        private Label labelColor;
         private PictureBox pictureBox1;
+        private Button button1;
+        private Button button2;
+        private Button button3;
     }
 }

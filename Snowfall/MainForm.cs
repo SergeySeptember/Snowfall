@@ -38,6 +38,7 @@ namespace Snowfall
         private async void Form1_Load(object sender, EventArgs e)
         {
             await InitialLoad();
+            LanguageTip();
             ColumnsConfig();
         }
 
@@ -63,6 +64,7 @@ namespace Snowfall
                 listOfNotes = iONotes.LoadAndSortNotes();
 
                 labelOnline.Text = "Online";
+                pictureOnline.Visible = true;
             }
             else
             {
@@ -71,6 +73,7 @@ namespace Snowfall
                 listOfNotes = iONotes.GetNotesFromJsons();
 
                 labelOnline.Text = "Offline";
+                pictureOffline.Visible = true;
             }
         }
 
@@ -138,6 +141,7 @@ namespace Snowfall
             buttonAll.Visible = true;
             buttonTrue.Visible = true;
             buttonFalse.Visible = true;
+            LanguageTip();
         }
 
         private void ButtonNote_Click(object sender, EventArgs e)
@@ -203,6 +207,22 @@ namespace Snowfall
             dataGridViewTasks.Columns[3].Width = 160;
         }
 
+        private void LanguageTip()
+        {
+            if (languageRus)
+            {
+                toolTipTrue.SetToolTip(buttonTrue, ChangeLanguage.languagesRus["Show completed tasks"]);
+                toolTipAll.SetToolTip(buttonAll, ChangeLanguage.languagesRus["Show all tasks"]);
+                toolTipFalse.SetToolTip(buttonFalse, ChangeLanguage.languagesRus["Show pending tasks"]);
+            }
+            else
+            {
+                toolTipTrue.SetToolTip(buttonTrue, ChangeLanguage.languagesEng["Show completed tasks"]);
+                toolTipAll.SetToolTip(buttonAll, ChangeLanguage.languagesEng["Show all tasks"]);
+                toolTipFalse.SetToolTip(buttonFalse, ChangeLanguage.languagesEng["Show pending tasks"]);
+            }
+        }
+
         private Color SelectThemeColor()
         {
             string color = ThemeColor.ColorList[1];
@@ -220,7 +240,7 @@ namespace Snowfall
                     currentButton = (Button)btnSender;
                     currentButton.BackColor = color;
                     currentButton.ForeColor = Color.White;
-                    currentButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                    currentButton.Font = new Font("Microsoft Sans Serif", 12.5F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
                 }
             }
         }

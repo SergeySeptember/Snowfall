@@ -33,6 +33,8 @@
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             panelMenu = new Panel();
+            pictureOffline = new PictureBox();
+            pictureOnline = new PictureBox();
             labelOnline = new Label();
             buttonSettings = new Button();
             buttonNote = new Button();
@@ -53,6 +55,8 @@
             toolTipTrue = new ToolTip(components);
             toolTipFalse = new ToolTip(components);
             panelMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureOffline).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureOnline).BeginInit();
             panelLogo.SuspendLayout();
             panelTitleBar.SuspendLayout();
             panelDesktop.SuspendLayout();
@@ -63,6 +67,8 @@
             // panelMenu
             // 
             panelMenu.BackColor = Color.FromArgb(51, 51, 73);
+            panelMenu.Controls.Add(pictureOffline);
+            panelMenu.Controls.Add(pictureOnline);
             panelMenu.Controls.Add(labelOnline);
             panelMenu.Controls.Add(buttonSettings);
             panelMenu.Controls.Add(buttonNote);
@@ -75,10 +81,32 @@
             panelMenu.TabIndex = 13;
             panelMenu.MouseDown += PanelMenu_MouseDown;
             // 
+            // pictureOffline
+            // 
+            pictureOffline.Image = (Image)resources.GetObject("pictureOffline.Image");
+            pictureOffline.Location = new Point(7, 534);
+            pictureOffline.Name = "pictureOffline";
+            pictureOffline.Size = new Size(15, 15);
+            pictureOffline.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureOffline.TabIndex = 6;
+            pictureOffline.TabStop = false;
+            pictureOffline.Visible = false;
+            // 
+            // pictureOnline
+            // 
+            pictureOnline.Image = Properties.Resources.online;
+            pictureOnline.Location = new Point(7, 535);
+            pictureOnline.Name = "pictureOnline";
+            pictureOnline.Size = new Size(15, 15);
+            pictureOnline.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureOnline.TabIndex = 5;
+            pictureOnline.TabStop = false;
+            pictureOnline.Visible = false;
+            // 
             // labelOnline
             // 
             labelOnline.AutoSize = true;
-            labelOnline.Location = new Point(12, 537);
+            labelOnline.Location = new Point(27, 535);
             labelOnline.Name = "labelOnline";
             labelOnline.Size = new Size(38, 15);
             labelOnline.TabIndex = 4;
@@ -308,6 +336,8 @@
             KeyDown += MainForm_KeyDown;
             panelMenu.ResumeLayout(false);
             panelMenu.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureOffline).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureOnline).EndInit();
             panelLogo.ResumeLayout(false);
             panelLogo.PerformLayout();
             panelTitleBar.ResumeLayout(false);
@@ -320,11 +350,9 @@
         #endregion
         private Panel panelMenu;
         private Panel panelLogo;
-        private Button buttonNote;
         private Panel panelTitleBar;
         private Label labelLogo;
         private Panel panelDesktop;
-        private Button buttonSettings;
         private Button buttonClose;
         private DataGridView dataGridViewTasks;
         private ContextMenuStrip contextMenu;
@@ -338,5 +366,9 @@
         private ToolTip toolTipTrue;
         private Label labelOnline;
         public Button buttonList;
+        public Button buttonNote;
+        public Button buttonSettings;
+        private PictureBox pictureOnline;
+        private PictureBox pictureOffline;
     }
 }
