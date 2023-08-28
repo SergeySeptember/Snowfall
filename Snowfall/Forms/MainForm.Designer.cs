@@ -140,7 +140,7 @@
             buttonNote.TabIndex = 2;
             buttonNote.Text = "Заметки";
             buttonNote.UseVisualStyleBackColor = true;
-            buttonNote.Click += ButtonNote_Click;
+            buttonNote.Click += ButtonNoteClick;
             // 
             // buttonList
             // 
@@ -155,7 +155,7 @@
             buttonList.TabIndex = 1;
             buttonList.Text = "Список дел";
             buttonList.UseVisualStyleBackColor = true;
-            buttonList.Click += ButtonList_Click;
+            buttonList.Click += ButtonListClick;
             // 
             // panelLogo
             // 
@@ -278,7 +278,7 @@
             dataGridViewTasks.BorderStyle = BorderStyle.None;
             dataGridViewTasks.CellBorderStyle = DataGridViewCellBorderStyle.None;
             dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.TopCenter;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.BackColor = SystemColors.ControlLightLight;
             dataGridViewCellStyle1.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
             dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(0, 150, 136);
@@ -350,11 +350,9 @@
         #endregion
         private Panel panelMenu;
         private Panel panelLogo;
-        private Panel panelTitleBar;
         private Label labelLogo;
         private Panel panelDesktop;
         private Button buttonClose;
-        private DataGridView dataGridViewTasks;
         private ContextMenuStrip contextMenu;
         private ToolStripMenuItem deleteToolStripMenuItem;
         private Button buttonAll;
@@ -370,5 +368,7 @@
         public Button buttonSettings;
         private PictureBox pictureOnline;
         private PictureBox pictureOffline;
+        public Panel panelTitleBar;
+        public DataGridView dataGridViewTasks;
     }
 }

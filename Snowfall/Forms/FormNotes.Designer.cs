@@ -46,7 +46,7 @@
             textBoxBody.Name = "textBoxBody";
             textBoxBody.Size = new Size(708, 495);
             textBoxBody.TabIndex = 1;
-            textBoxBody.KeyDown += textBoxBody_KeyDown;
+            textBoxBody.KeyDown += TextBoxBodyKeyDown;
             // 
             // dataGridViewNotes
             // 
@@ -78,11 +78,11 @@
             dataGridViewNotes.SelectionMode = DataGridViewSelectionMode.CellSelect;
             dataGridViewNotes.Size = new Size(172, 495);
             dataGridViewNotes.TabIndex = 13;
-            dataGridViewNotes.CellClick += dataGridViewNotes_CellClick;
-            dataGridViewNotes.CellEndEdit += dataGridViewNotes_CellEndEdit;
-            dataGridViewNotes.CellMouseDown += dataGridViewNotes_CellMouseDown;
-            dataGridViewNotes.MouseEnter += dataGridViewNotes_MouseEnter;
-            dataGridViewNotes.MouseLeave += dataGridViewNotes_MouseLeave;
+            dataGridViewNotes.CellClick += DataGridViewNotesCellClick;
+            dataGridViewNotes.CellEndEdit += DataGridViewNotesCellEndEdit;
+            dataGridViewNotes.CellMouseDown += DataGridViewNotesCellMouseDown;
+            dataGridViewNotes.MouseEnter += DataGridViewNotesMouseEnter;
+            dataGridViewNotes.MouseLeave += DataGridViewNotesMouseLeave;
             // 
             // contextMenu
             // 
@@ -95,7 +95,7 @@
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             deleteToolStripMenuItem.Size = new Size(107, 22);
             deleteToolStripMenuItem.Text = "Delete";
-            deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
+            deleteToolStripMenuItem.Click += DeleteToolStripMenuItemClick;
             // 
             // FormNotes
             // 

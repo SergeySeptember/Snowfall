@@ -1,19 +1,18 @@
 ﻿using Snowfall.Service;
 using System.Diagnostics;
-using System.Security.Policy;
 
 namespace Snowfall.Forms
 {
     public partial class FormSettings : Form
     {
-        MainForm mainForm;
+        private MainForm _mainForm;
         public FormSettings(MainForm owner)
         {
-            this.mainForm = owner;
+            _mainForm = owner;
             InitializeComponent();
         }
 
-        private void pictureBox1_Click(object sender, EventArgs e)
+        private void PictureBoxLogoClick(object sender, EventArgs e)
         {
             Process.Start(new ProcessStartInfo
             {
@@ -24,28 +23,77 @@ namespace Snowfall.Forms
 
         private void PictureBoxRusClick(object sender, EventArgs e)
         {
-            mainForm.languageRus = true;
-            labelMode.Text = ChangeLanguage.languagesRus["L/D Theme"];
+            _mainForm.languageRus = true;
             labelColor.Text = ChangeLanguage.languagesRus["Change color"];
-            mainForm.buttonList.Text = ChangeLanguage.languagesRus["Todo List"];
-            mainForm.buttonNote.Text = ChangeLanguage.languagesRus["Notes"];
-            mainForm.buttonSettings.Text = ChangeLanguage.languagesRus["Settings"];
+            labelChangeLang.Text = ChangeLanguage.languagesRus["Change Language"];
+            _mainForm.buttonList.Text = ChangeLanguage.languagesRus["Todo List"];
+            _mainForm.buttonNote.Text = ChangeLanguage.languagesRus["Notes"];
+            _mainForm.buttonSettings.Text = ChangeLanguage.languagesRus["Settings"];
         }
 
         private void PictureBoxEngClick(object sender, EventArgs e)
         {
-            mainForm.languageRus = false;
-            labelMode.Text = ChangeLanguage.languagesEng["L/D Theme"];
+            _mainForm.languageRus = false;
             labelColor.Text = ChangeLanguage.languagesEng["Change color"];
-            mainForm.buttonList.Text = ChangeLanguage.languagesEng["Todo List"];
-            mainForm.buttonNote.Text = ChangeLanguage.languagesEng["Notes"];
-            mainForm.buttonSettings.Text = ChangeLanguage.languagesEng["Settings"];
+            labelChangeLang.Text = ChangeLanguage.languagesEng["Change Language"];
+            _mainForm.buttonList.Text = ChangeLanguage.languagesEng["Todo List"];
+            _mainForm.buttonNote.Text = ChangeLanguage.languagesEng["Notes"];
+            _mainForm.buttonSettings.Text = ChangeLanguage.languagesEng["Settings"];
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ChangeColor(int index)
         {
-
+            _mainForm.color = ThemeColor.ColorList[index];
+            _mainForm.panelTitleBar.BackColor = ColorTranslator.FromHtml(ThemeColor.ColorList[index]);
+            _mainForm.currentButton.BackColor = ColorTranslator.FromHtml(ThemeColor.ColorList[index]);
+            _mainForm.dataGridViewTasks.DefaultCellStyle.SelectionBackColor = ColorTranslator.FromHtml(ThemeColor.ColorList[index]);
         }
+        #region [PictureBoxClick]
+        private void PictureBox1Click(object sender, EventArgs e)
+        {
+            ChangeColor(0);
+        }
+
+        private void PictureBox2Click(object sender, EventArgs e)
+        {
+            ChangeColor(1);
+        }
+
+        private void PictureBox3Click(object sender, EventArgs e)
+        {
+            ChangeColor(2);
+        }
+
+        private void PictureBox4Click(object sender, EventArgs e)
+        {
+            ChangeColor(3);
+        }
+
+        private void PictureBox5Click(object sender, EventArgs e)
+        {
+            ChangeColor(4);
+        }
+
+        private void PictureBox6Click(object sender, EventArgs e)
+        {
+            ChangeColor(5);
+        }
+
+        private void PictureBox7Click(object sender, EventArgs e)
+        {
+            ChangeColor(6);
+        }
+
+        private void PictureBox8Click(object sender, EventArgs e)
+        {
+            ChangeColor(7);
+        }
+
+        private void PictureBox9Click(object sender, EventArgs e)
+        {
+            ChangeColor(8);
+        }
+        #endregion
     }
 }

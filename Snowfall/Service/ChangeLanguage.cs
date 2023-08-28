@@ -10,7 +10,6 @@ namespace Snowfall.Service
     {
         public static Dictionary<string, string> languagesRus = new()
         {
-            {"L/D Theme","Светлая/тёмная тема"},
             {"Change Language","Смена языка"},
             {"Todo List", "Список дел" },
             {"Notes", "Заметки"},
@@ -23,7 +22,6 @@ namespace Snowfall.Service
 
         public static Dictionary<string, string> languagesEng = new()
         {
-            {"L/D Theme","Light/Dark Theme"},
             {"Change Language","Change Language"},
             {"Todo List", "Todo List" },
             {"Notes", "Notes"},

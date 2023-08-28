@@ -12,23 +12,23 @@ namespace Snowfall
     {
         public GoogleHelper googleHelper;
         //private string[] token = File.ReadAllLines($"{Environment.CurrentDirectory}\\token.json");
-        private string[] token = File.ReadAllLines($"C:\\token.json");
-        private string todoSheet = "Snowfall";
-        private bool successConnect = true;
-        private bool categoryFlag = false;
-        private bool categorySortByTrue = false;
-        private Button currentButton;
-        private Form activeForm;
+        private string[] _token = File.ReadAllLines($"C:\\token.json");
+        private string _todoSheet = "Snowfall";
+        private bool _successConnect = true;
+        private bool _categoryFlag = false;
+        private bool _categorySortByTrue = false;
+        public Button currentButton;
+        private Form _activeForm;
         public FormNotes formNotes;
         public bool languageRus = true;
+        public string color = ThemeColor.ColorList[1];
 
-        private IOTasks iOTasks;
-        private IONotes iONotes;
+        private IOTasks _iOTasks;
+        private IONotes _iONotes;
         private TaskProcessing _taskProcessing = new();
-
-        public BindingList<TaskBody> listOfTasks = new BindingList<TaskBody>();
-        public BindingList<TaskBody> category = new BindingList<TaskBody>();
-        public BindingList<NoteBody> listOfNotes = new BindingList<NoteBody>();
+        public BindingList<TaskBody> listOfTasks = new();
+        public BindingList<TaskBody> category = new();
+        public BindingList<NoteBody> listOfNotes = new();
 
         public MainForm()
         {
@@ -38,39 +38,40 @@ namespace Snowfall
         private async void Form1_Load(object sender, EventArgs e)
         {
             await InitialLoad();
+            InitialTheme();
             LanguageTip();
             ColumnsConfig();
         }
 
         private async Task InitialLoad()
         {
-            googleHelper = new GoogleHelper(token[0], todoSheet);
-            iOTasks = new IOTasks(googleHelper);
-            iONotes = new IONotes(googleHelper);
+            googleHelper = new GoogleHelper(_token[0], _todoSheet);
+            _iOTasks = new IOTasks(googleHelper);
+            _iONotes = new IONotes(googleHelper);
 
             try
             {
-                successConnect = await googleHelper.Start();
+                _successConnect = await googleHelper.Start();
             }
             catch (Exception ex)
             {
-                successConnect = false;
+                _successConnect = false;
             }
 
-            if (successConnect == true)
+            if (_successConnect == true)
             {
-                listOfTasks = iOTasks.LoadAndSortTasks();
+                listOfTasks = _iOTasks.LoadAndSortTasks();
                 dataGridViewTasks.DataSource = listOfTasks;
-                listOfNotes = iONotes.LoadAndSortNotes();
+                listOfNotes = _iONotes.LoadAndSortNotes();
 
                 labelOnline.Text = "Online";
                 pictureOnline.Visible = true;
             }
             else
             {
-                listOfTasks = iOTasks.GetTasksFromJson();
+                listOfTasks = _iOTasks.GetTasksFromJson();
                 dataGridViewTasks.DataSource = listOfTasks;
-                listOfNotes = iONotes.GetNotesFromJsons();
+                listOfNotes = _iONotes.GetNotesFromJsons();
 
                 labelOnline.Text = "Offline";
                 pictureOffline.Visible = true;
@@ -80,13 +81,13 @@ namespace Snowfall
         #region [Events]
         private void SaveCellEdit(object sender, DataGridViewCellEventArgs e)
         {
-            if (categoryFlag)
+            if (_categoryFlag)
             {
-                iOTasks.SaveCellEditByCategory(successConnect, dataGridViewTasks.CurrentCell.RowIndex, category, listOfTasks);
+                _iOTasks.SaveCellEditByCategory(_successConnect, dataGridViewTasks.CurrentCell.RowIndex, category, listOfTasks);
             }
             else
             {
-                iOTasks.SaveCellEdit(successConnect, dataGridViewTasks.CurrentCell.RowIndex, listOfTasks);
+                _iOTasks.SaveCellEdit(_successConnect, dataGridViewTasks.CurrentCell.RowIndex, listOfTasks);
             }
         }
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -94,21 +95,21 @@ namespace Snowfall
             if (e.KeyCode == Keys.F5)
             {
                 listOfTasks.Clear();
-                listOfTasks = iOTasks.LoadAndSortTasks();
+                listOfTasks = _iOTasks.LoadAndSortTasks();
                 dataGridViewTasks.DataSource = listOfTasks;
             }
         }
 
         private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (categoryFlag == true)
+            if (_categoryFlag == true)
             {
-                category = iOTasks.DeleteTaskInCategory(dataGridViewTasks.CurrentCell.RowIndex, listOfTasks, category, successConnect, categorySortByTrue);
+                category = _iOTasks.DeleteTaskInCategory(dataGridViewTasks.CurrentCell.RowIndex, listOfTasks, category, _successConnect, _categorySortByTrue);
                 dataGridViewTasks.DataSource = category;
             }
             else
             {
-                dataGridViewTasks.DataSource = iOTasks.DeleteTask(dataGridViewTasks.CurrentCell.RowIndex, listOfTasks, successConnect);
+                dataGridViewTasks.DataSource = _iOTasks.DeleteTask(dataGridViewTasks.CurrentCell.RowIndex, listOfTasks, _successConnect);
             }
         }
 
@@ -132,10 +133,10 @@ namespace Snowfall
             }
         }
 
-        private void ButtonList_Click(object sender, EventArgs e)
+        private void ButtonListClick(object sender, EventArgs e)
         {
-            if (activeForm != null)
-                activeForm.Close();
+            if (_activeForm != null)
+                _activeForm.Close();
             Reset();
             ActivateButton(sender);
             buttonAll.Visible = true;
@@ -144,9 +145,9 @@ namespace Snowfall
             LanguageTip();
         }
 
-        private void ButtonNote_Click(object sender, EventArgs e)
+        private void ButtonNoteClick(object sender, EventArgs e)
         {
-            OpenChildForm(new FormNotes(googleHelper, listOfNotes, successConnect, languageRus), sender);
+            OpenChildForm(new FormNotes(googleHelper, listOfNotes, _successConnect, languageRus, color), sender);
             buttonAll.Visible = false;
             buttonTrue.Visible = false;
             buttonFalse.Visible = false;
@@ -163,23 +164,23 @@ namespace Snowfall
         {
 
             dataGridViewTasks.DataSource = _taskProcessing.FilterTasks(listOfTasks);
-            categoryFlag = false;
+            _categoryFlag = false;
         }
 
         public void ButtonTrue_Click(object sender, EventArgs e)
         {
             category = _taskProcessing.OrderByTrue(listOfTasks);
             dataGridViewTasks.DataSource = category;
-            categoryFlag = true;
-            categorySortByTrue = true;
+            _categoryFlag = true;
+            _categorySortByTrue = true;
         }
 
         private void ButtonFalse_Click(object sender, EventArgs e)
         {
             category = _taskProcessing.OrderByFalse(listOfTasks);
             dataGridViewTasks.DataSource = category;
-            categoryFlag = true;
-            categorySortByTrue = false;
+            _categoryFlag = true;
+            _categorySortByTrue = false;
         }
 
         private void ButtonClose_Click(object sender, EventArgs e)
@@ -222,10 +223,17 @@ namespace Snowfall
                 toolTipFalse.SetToolTip(buttonFalse, ChangeLanguage.languagesEng["Show pending tasks"]);
             }
         }
+        private void InitialTheme()
+        {
+            buttonList.BackColor = ColorTranslator.FromHtml(color);
+            buttonList.ForeColor = Color.White;
+            buttonList.Font = new Font("Microsoft Sans Serif", 12.5F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+
+            panelTitleBar.BackColor = ColorTranslator.FromHtml(color);
+        }
 
         private Color SelectThemeColor()
         {
-            string color = ThemeColor.ColorList[1];
             return ColorTranslator.FromHtml(color);
         }
 
@@ -253,20 +261,20 @@ namespace Snowfall
                 {
                     previousBtn.BackColor = Color.FromArgb(51, 51, 76);
                     previousBtn.ForeColor = Color.Gainsboro;
-                    previousBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                    previousBtn.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
                 }
             }
         }
 
         private void OpenChildForm(Form childForm, object btnSender)
         {
-            if (activeForm != null)
+            if (_activeForm != null)
             {
-                activeForm.Close();
+                _activeForm.Close();
             }
 
             ActivateButton(btnSender);
-            activeForm = childForm;
+            _activeForm = childForm;
             childForm.TopLevel = false;
             childForm.FormBorderStyle = FormBorderStyle.None;
             childForm.Dock = DockStyle.Fill;
@@ -279,7 +287,6 @@ namespace Snowfall
         private void Reset()
         {
             DisableButton();
-            panelTitleBar.BackColor = Color.FromArgb(0, 150, 136);
             panelLogo.BackColor = Color.FromArgb(39, 39, 58);
             currentButton = null;
         }
