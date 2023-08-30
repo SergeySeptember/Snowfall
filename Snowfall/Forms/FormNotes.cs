@@ -30,13 +30,9 @@ namespace Snowfall.Forms
             dataGridViewNotes.Columns[0].Width = 179;
             dataGridViewNotes.DefaultCellStyle.SelectionBackColor = ColorTranslator.FromHtml(_color);
             if (_languageRus)
-            {
                 dataGridViewNotes.Columns[0].HeaderText = "Заметки";
-            }
             else
-            {
                 dataGridViewNotes.Columns[0].HeaderText = "Notes";
-            }
         }
 
         private void LoadNotes()
@@ -53,10 +49,7 @@ namespace Snowfall.Forms
             textBoxBody.Text = _listOfNotes[index].Description;
         }
 
-        private void DataGridViewNotesCellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            SaveNoteChanges();
-        }
+        private void DataGridViewNotesCellEndEdit(object sender, DataGridViewCellEventArgs e) => SaveNoteChanges();
 
         private void TextBoxBodyKeyDown(object sender, KeyEventArgs e)
         {

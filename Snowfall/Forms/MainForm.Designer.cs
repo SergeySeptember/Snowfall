@@ -79,7 +79,7 @@
             panelMenu.Name = "panelMenu";
             panelMenu.Size = new Size(217, 561);
             panelMenu.TabIndex = 13;
-            panelMenu.MouseDown += PanelMenu_MouseDown;
+            panelMenu.MouseDown += PanelMenuMouseDown;
             // 
             // pictureOffline
             // 
@@ -125,7 +125,7 @@
             buttonSettings.TabIndex = 3;
             buttonSettings.Text = "Настрйоки";
             buttonSettings.UseVisualStyleBackColor = true;
-            buttonSettings.Click += ButtonSettings_Click;
+            buttonSettings.Click += ButtonSettingsClick;
             // 
             // buttonNote
             // 
@@ -166,7 +166,7 @@
             panelLogo.Name = "panelLogo";
             panelLogo.Size = new Size(217, 63);
             panelLogo.TabIndex = 0;
-            panelLogo.MouseDown += PanelLogo_MouseDown;
+            panelLogo.MouseDown += PanelLogoMouseDown;
             // 
             // labelLogo
             // 
@@ -192,7 +192,7 @@
             buttonAll.TabIndex = 4;
             toolTipAll.SetToolTip(buttonAll, "Show all tasks");
             buttonAll.UseVisualStyleBackColor = true;
-            buttonAll.Click += ButtonAll_Click;
+            buttonAll.Click += ButtonAllClick;
             // 
             // panelTitleBar
             // 
@@ -207,7 +207,7 @@
             panelTitleBar.Name = "panelTitleBar";
             panelTitleBar.Size = new Size(767, 50);
             panelTitleBar.TabIndex = 14;
-            panelTitleBar.MouseDown += PanelTitleBar_MouseDown;
+            panelTitleBar.MouseDown += PanelTitleBarMouseDown;
             // 
             // buttonMin
             // 
@@ -220,7 +220,7 @@
             buttonMin.Size = new Size(20, 20);
             buttonMin.TabIndex = 10;
             buttonMin.UseVisualStyleBackColor = true;
-            buttonMin.Click += ButtonMin_Click;
+            buttonMin.Click += ButtonMinClick;
             // 
             // buttonClose
             // 
@@ -233,7 +233,7 @@
             buttonClose.Size = new Size(20, 20);
             buttonClose.TabIndex = 0;
             buttonClose.UseVisualStyleBackColor = true;
-            buttonClose.Click += ButtonClose_Click;
+            buttonClose.Click += ButtonCloseClick;
             // 
             // buttonFalse
             // 
@@ -247,7 +247,7 @@
             buttonFalse.TabIndex = 5;
             toolTipFalse.SetToolTip(buttonFalse, "Show all pending");
             buttonFalse.UseVisualStyleBackColor = true;
-            buttonFalse.Click += ButtonFalse_Click;
+            buttonFalse.Click += ButtonFalseClick;
             // 
             // buttonTrue
             // 
@@ -261,7 +261,7 @@
             buttonTrue.TabIndex = 6;
             toolTipTrue.SetToolTip(buttonTrue, "Показать все выполненные");
             buttonTrue.UseVisualStyleBackColor = true;
-            buttonTrue.Click += ButtonTrue_Click;
+            buttonTrue.Click += ButtonTrueClick;
             // 
             // panelDesktop
             // 
@@ -304,7 +304,7 @@
             dataGridViewTasks.Size = new Size(767, 511);
             dataGridViewTasks.TabIndex = 12;
             dataGridViewTasks.CellEndEdit += SaveCellEdit;
-            dataGridViewTasks.CellMouseDown += DataGridView1_CellMouseDown;
+            dataGridViewTasks.CellMouseDown += DataGridViewTasksCellMouseDown;
             // 
             // contextMenu
             // 
@@ -317,7 +317,7 @@
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             deleteToolStripMenuItem.Size = new Size(107, 22);
             deleteToolStripMenuItem.Text = "Delete";
-            deleteToolStripMenuItem.Click += DeleteToolStripMenuItem_Click;
+            deleteToolStripMenuItem.Click += DeleteToolStripMenuItemClick;
             // 
             // MainForm
             // 
@@ -332,8 +332,8 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Snowfall";
-            Load += Form1_Load;
-            KeyDown += MainForm_KeyDown;
+            Load += MainFormLoad;
+            KeyDown += MainFormKeyDown;
             panelMenu.ResumeLayout(false);
             panelMenu.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureOffline).EndInit();
