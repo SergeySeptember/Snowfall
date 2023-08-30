@@ -1,6 +1,9 @@
 ﻿using Snowfall.Entity;
 using Snowfall.Service;
+using Snowfall.Service.ActionWithNotes;
+using System;
 using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace Snowfall.Forms
 {
@@ -12,6 +15,7 @@ namespace Snowfall.Forms
         private bool _languageRus;
         private bool _expection = false;
         private string _color;
+        private IONotes _iONotes;
         public FormNotes(GoogleHelper googleHelper, BindingList<NoteBody> listOfNotes, bool successConnect, bool languageRus, string color)
         {
             secondGoogleHelper = googleHelper;
@@ -19,6 +23,7 @@ namespace Snowfall.Forms
             _successConnect = successConnect;
             _languageRus = languageRus;
             _color = color;
+            _iONotes = new(secondGoogleHelper);
 
             InitializeComponent();
             LoadNotes();
@@ -29,6 +34,8 @@ namespace Snowfall.Forms
         {
             dataGridViewNotes.Columns[0].Width = 179;
             dataGridViewNotes.DefaultCellStyle.SelectionBackColor = ColorTranslator.FromHtml(_color);
+            textBoxBody.Text = _listOfNotes[0].Description;
+
             if (_languageRus)
                 dataGridViewNotes.Columns[0].HeaderText = "Заметки";
             else
@@ -37,8 +44,13 @@ namespace Snowfall.Forms
 
         private void LoadNotes()
         {
-            for (int i = 0; i < _listOfNotes.Count; i++)
+            if (_listOfNotes.Count != 0)
             {
+                dataGridViewNotes.DataSource = _listOfNotes;
+            }
+            else
+            {
+                _listOfNotes.Add(new NoteBody { NoteName = "Введите название", Description = "Введите текст" });
                 dataGridViewNotes.DataSource = _listOfNotes;
             }
         }
@@ -49,33 +61,19 @@ namespace Snowfall.Forms
             textBoxBody.Text = _listOfNotes[index].Description;
         }
 
-        private void DataGridViewNotesCellEndEdit(object sender, DataGridViewCellEventArgs e) => SaveNoteChanges();
+        private void DataGridViewNotesCellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            _iONotes.SaveNoteChanges(dataGridViewNotes.CurrentCell.RowIndex, textBoxBody.Text, _successConnect, _listOfNotes);
+            SendKeys.Send("{UP}");
+        }
+            
 
         private void TextBoxBodyKeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
                 dataGridViewNotes.Focus();
-                SaveNoteChanges();
-            }
-        }
-
-        public void SaveNoteChanges()
-        {
-            int index = dataGridViewNotes.CurrentCell.RowIndex;
-
-            if (_listOfNotes.Count > index && !string.IsNullOrWhiteSpace(_listOfNotes[index].NoteName))
-            {
-                _listOfNotes[index].Description = textBoxBody.Text;
-
-                if (_successConnect == true)
-                {
-                    int lineNumber = dataGridViewNotes.CurrentCell.RowIndex + 1;
-
-                    secondGoogleHelper.SetNotes(cellName1: $"A{lineNumber}", cellName2: $"E{lineNumber}", _listOfNotes[index].NoteName, _listOfNotes[index].Description);
-                }
-
-                FileIOService.SaveNotesToJson(_listOfNotes);
+                _iONotes.SaveNoteChanges(dataGridViewNotes.CurrentCell.RowIndex, textBoxBody.Text, _successConnect, _listOfNotes);
             }
         }
 
@@ -106,8 +104,8 @@ namespace Snowfall.Forms
         private void DeleteToolStripMenuItemClick(object sender, EventArgs e)
         {
             int index = dataGridViewNotes.CurrentCell.RowIndex;
+            _iONotes.DeleteNote(index, textBoxBody.Text, _successConnect, _listOfNotes);
             _listOfNotes.RemoveAt(index);
-            secondGoogleHelper.DeleteRowOfNotes(index);
             FileIOService.SaveNotesToJson(_listOfNotes);
         }
 

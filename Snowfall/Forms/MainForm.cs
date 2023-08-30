@@ -11,8 +11,7 @@ namespace Snowfall
     public partial class MainForm : Form
     {
         public GoogleHelper googleHelper;
-        //private string[] token = File.ReadAllLines($"{Environment.CurrentDirectory}\\token.json");
-        private string[] _token = File.ReadAllLines($"C:\\token.json");
+        private string[] _token = File.ReadAllLines($"{Environment.CurrentDirectory}\\token.json");
         private string _todoSheet = "Snowfall";
         private bool _successConnect = true;
         private bool _categoryFlag = false;
@@ -63,7 +62,7 @@ namespace Snowfall
             else
                 Eng();
         }
-        
+
         private async Task InitialLoad()
         {
             googleHelper = new GoogleHelper(_token[0], _todoSheet);
@@ -209,7 +208,7 @@ namespace Snowfall
         private extern static void ReleaseCapture();
         [DllImport("user32.DLL", EntryPoint = "SendMessage")]
         private extern static void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
-        
+
         private void Rus()
         {
             LanguageRus = true;
@@ -217,7 +216,7 @@ namespace Snowfall
             buttonNote.Text = ChangeLanguage.languagesRus["Notes"];
             buttonSettings.Text = ChangeLanguage.languagesRus["Settings"];
         }
-       
+
         private void Eng()
         {
             LanguageRus = false;
@@ -225,13 +224,15 @@ namespace Snowfall
             buttonNote.Text = ChangeLanguage.languagesEng["Notes"];
             buttonSettings.Text = ChangeLanguage.languagesEng["Settings"];
         }
-        
+
         private void ColumnsConfig()
         {
             dataGridViewTasks.Columns[0].Width = 460;
             dataGridViewTasks.Columns[1].Width = 50;
             dataGridViewTasks.Columns[2].Width = 100;
             dataGridViewTasks.Columns[3].Width = 160;
+
+            dataGridViewTasks.Columns[2].DefaultCellStyle.Alignment = DataGridViewContentAlignment.TopCenter;
         }
 
         private void LanguageTip()

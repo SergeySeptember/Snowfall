@@ -328,6 +328,7 @@
             Controls.Add(panelTitleBar);
             Controls.Add(panelMenu);
             FormBorderStyle = FormBorderStyle.None;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             KeyPreview = true;
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
