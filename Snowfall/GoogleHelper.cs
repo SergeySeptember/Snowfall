@@ -115,16 +115,16 @@ namespace Snowfall
 
         public void SetTasks(string cellName1, string cellName2, string value1, string value2, string value3, string value4, string value5, string value6, string value7)
         {
-                var range = this.sheetName + "!" + cellName1 + ":" + cellName2;
-                var values = new List<List<object>> { new List<object> { value1, value2, value3, value4, value5, value6, value7 } };
+            var range = this.sheetName + "!" + cellName1 + ":" + cellName2;
+            var values = new List<List<object>> { new List<object> { value1, value2, value3, value4, value5, value6, value7 } };
 
-                var request = this.sheetService.Spreadsheets.Values.Update(
-                    new ValueRange { Values = new List<IList<object>>(values) },
-                    spreadsheetId: this.sheetFileId,
-                    range: range
-                    );
-                request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
-                var response = request.Execute();
+            var request = this.sheetService.Spreadsheets.Values.Update(
+                new ValueRange { Values = new List<IList<object>>(values) },
+                spreadsheetId: this.sheetFileId,
+                range: range
+                );
+            request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            var response = request.Execute();
         }
 
         public BindingList<TaskBody> GetTasks(string cellName, string cellName2)
@@ -168,9 +168,7 @@ namespace Snowfall
             var response = request.Execute();
 
             if (response.Values is null)
-            {
                 return 0;
-            }
 
             return response.Values.Count;
         }
@@ -199,6 +197,7 @@ namespace Snowfall
             var request = sheetService.Spreadsheets.BatchUpdate(batchUpdateRequest, this.sheetFileId);
             request.Execute();
         }
+
         public BindingList<NoteBody> GetNotes(string cellName, string cellName2)
         {
             var range = "Notes!" + cellName + ":" + cellName2;
@@ -209,22 +208,28 @@ namespace Snowfall
                 );
             var response = request.Execute();
 
-            BindingList<NoteBody> resultList = new BindingList<NoteBody>();
+            BindingList<NoteBody> resultList = new();
 
             for (int i = 0; i < response.Values.Count; i++)
             {
-                NoteBody noteBody = new NoteBody();
-
-                noteBody.NoteName = response.Values[i][0].ToString();
+                NoteBody noteBody = new();
 
                 if (response.Values[i].Count > 1)
+                {
+                    noteBody.NoteName = response.Values[i][0].ToString();
                     noteBody.Description = response.Values[i][1].ToString();
+                    noteBody.IsDeleted = Convert.ToBoolean(response.Values[i][2]);
+                    noteBody.TimeUpdate = response.Values[i][3].ToString();
+                }
                 else
+                {
+                    noteBody.NoteName = "Введите название";
                     noteBody.Description = "Введите текст";
-
+                    noteBody.IsDeleted = false;
+                    noteBody.TimeUpdate = DateTime.Now.ToString();
+                }
                 resultList.Add(noteBody);
             }
-
             return resultList;
         }
 
@@ -246,10 +251,10 @@ namespace Snowfall
             return response.Values.Count;
         }
 
-        public void SetNotes(string cellName1, string cellName2, string value1, string value2)
+        public void SetNotes(string cellName1, string cellName2, string value1, string value2, string value3, string value4)
         {
             var range = "Notes!" + cellName1 + ":" + cellName2;
-            var values = new List<List<object>> { new List<object> { value1, value2 } };
+            var values = new List<List<object>> { new List<object> { value1, value2, value3, value4 } };
             var request = this.sheetService.Spreadsheets.Values.Update(
             new ValueRange { Values = new List<IList<object>>(values) },
             spreadsheetId: this.sheetFileId,
