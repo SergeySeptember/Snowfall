@@ -7,7 +7,6 @@ namespace Snowfall.Entity
         private string _noteName;
         private string _description;
 
-        [DisplayName("Список заметок")]
         public string NoteName
         {
             get => _noteName;

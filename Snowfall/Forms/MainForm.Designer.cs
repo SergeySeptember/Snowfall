@@ -33,6 +33,9 @@
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             panelMenu = new Panel();
+            pictureOffline = new PictureBox();
+            pictureOnline = new PictureBox();
+            labelOnline = new Label();
             buttonSettings = new Button();
             buttonNote = new Button();
             buttonList = new Button();
@@ -51,8 +54,9 @@
             toolTipAll = new ToolTip(components);
             toolTipTrue = new ToolTip(components);
             toolTipFalse = new ToolTip(components);
-            labelOnline = new Label();
             panelMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureOffline).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureOnline).BeginInit();
             panelLogo.SuspendLayout();
             panelTitleBar.SuspendLayout();
             panelDesktop.SuspendLayout();
@@ -63,6 +67,8 @@
             // panelMenu
             // 
             panelMenu.BackColor = Color.FromArgb(51, 51, 73);
+            panelMenu.Controls.Add(pictureOffline);
+            panelMenu.Controls.Add(pictureOnline);
             panelMenu.Controls.Add(labelOnline);
             panelMenu.Controls.Add(buttonSettings);
             panelMenu.Controls.Add(buttonNote);
@@ -73,7 +79,38 @@
             panelMenu.Name = "panelMenu";
             panelMenu.Size = new Size(217, 561);
             panelMenu.TabIndex = 13;
-            panelMenu.MouseDown += PanelMenu_MouseDown;
+            panelMenu.MouseDown += PanelMenuMouseDown;
+            // 
+            // pictureOffline
+            // 
+            pictureOffline.Image = (Image)resources.GetObject("pictureOffline.Image");
+            pictureOffline.Location = new Point(7, 534);
+            pictureOffline.Name = "pictureOffline";
+            pictureOffline.Size = new Size(15, 15);
+            pictureOffline.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureOffline.TabIndex = 6;
+            pictureOffline.TabStop = false;
+            pictureOffline.Visible = false;
+            // 
+            // pictureOnline
+            // 
+            pictureOnline.Image = Properties.Resources.online;
+            pictureOnline.Location = new Point(7, 535);
+            pictureOnline.Name = "pictureOnline";
+            pictureOnline.Size = new Size(15, 15);
+            pictureOnline.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureOnline.TabIndex = 5;
+            pictureOnline.TabStop = false;
+            pictureOnline.Visible = false;
+            // 
+            // labelOnline
+            // 
+            labelOnline.AutoSize = true;
+            labelOnline.Location = new Point(27, 535);
+            labelOnline.Name = "labelOnline";
+            labelOnline.Size = new Size(38, 15);
+            labelOnline.TabIndex = 4;
+            labelOnline.Text = "label1";
             // 
             // buttonSettings
             // 
@@ -88,7 +125,7 @@
             buttonSettings.TabIndex = 3;
             buttonSettings.Text = "Настрйоки";
             buttonSettings.UseVisualStyleBackColor = true;
-            buttonSettings.Click += ButtonSettings_Click;
+            buttonSettings.Click += ButtonSettingsClick;
             // 
             // buttonNote
             // 
@@ -103,7 +140,7 @@
             buttonNote.TabIndex = 2;
             buttonNote.Text = "Заметки";
             buttonNote.UseVisualStyleBackColor = true;
-            buttonNote.Click += ButtonNote_Click;
+            buttonNote.Click += ButtonNoteClick;
             // 
             // buttonList
             // 
@@ -118,7 +155,7 @@
             buttonList.TabIndex = 1;
             buttonList.Text = "Список дел";
             buttonList.UseVisualStyleBackColor = true;
-            buttonList.Click += ButtonList_Click;
+            buttonList.Click += ButtonListClick;
             // 
             // panelLogo
             // 
@@ -129,7 +166,7 @@
             panelLogo.Name = "panelLogo";
             panelLogo.Size = new Size(217, 63);
             panelLogo.TabIndex = 0;
-            panelLogo.MouseDown += PanelLogo_MouseDown;
+            panelLogo.MouseDown += PanelLogoMouseDown;
             // 
             // labelLogo
             // 
@@ -155,7 +192,7 @@
             buttonAll.TabIndex = 4;
             toolTipAll.SetToolTip(buttonAll, "Show all tasks");
             buttonAll.UseVisualStyleBackColor = true;
-            buttonAll.Click += ButtonAll_Click;
+            buttonAll.Click += ButtonAllClick;
             // 
             // panelTitleBar
             // 
@@ -170,7 +207,7 @@
             panelTitleBar.Name = "panelTitleBar";
             panelTitleBar.Size = new Size(767, 50);
             panelTitleBar.TabIndex = 14;
-            panelTitleBar.MouseDown += PanelTitleBar_MouseDown;
+            panelTitleBar.MouseDown += PanelTitleBarMouseDown;
             // 
             // buttonMin
             // 
@@ -183,7 +220,7 @@
             buttonMin.Size = new Size(20, 20);
             buttonMin.TabIndex = 10;
             buttonMin.UseVisualStyleBackColor = true;
-            buttonMin.Click += ButtonMin_Click;
+            buttonMin.Click += ButtonMinClick;
             // 
             // buttonClose
             // 
@@ -196,7 +233,7 @@
             buttonClose.Size = new Size(20, 20);
             buttonClose.TabIndex = 0;
             buttonClose.UseVisualStyleBackColor = true;
-            buttonClose.Click += ButtonClose_Click;
+            buttonClose.Click += ButtonCloseClick;
             // 
             // buttonFalse
             // 
@@ -210,7 +247,7 @@
             buttonFalse.TabIndex = 5;
             toolTipFalse.SetToolTip(buttonFalse, "Show all pending");
             buttonFalse.UseVisualStyleBackColor = true;
-            buttonFalse.Click += ButtonFalse_Click;
+            buttonFalse.Click += ButtonFalseClick;
             // 
             // buttonTrue
             // 
@@ -224,7 +261,7 @@
             buttonTrue.TabIndex = 6;
             toolTipTrue.SetToolTip(buttonTrue, "Показать все выполненные");
             buttonTrue.UseVisualStyleBackColor = true;
-            buttonTrue.Click += ButtonTrue_Click;
+            buttonTrue.Click += ButtonTrueClick;
             // 
             // panelDesktop
             // 
@@ -235,13 +272,13 @@
             panelDesktop.Size = new Size(767, 511);
             panelDesktop.TabIndex = 15;
             // 
-            // dataGridView1
+            // dataGridViewTasks
             // 
             dataGridViewTasks.BackgroundColor = SystemColors.ControlLightLight;
             dataGridViewTasks.BorderStyle = BorderStyle.None;
             dataGridViewTasks.CellBorderStyle = DataGridViewCellBorderStyle.None;
             dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.TopCenter;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.BackColor = SystemColors.ControlLightLight;
             dataGridViewCellStyle1.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
             dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(0, 150, 136);
@@ -259,7 +296,7 @@
             dataGridViewTasks.DefaultCellStyle = dataGridViewCellStyle2;
             dataGridViewTasks.Dock = DockStyle.Fill;
             dataGridViewTasks.Location = new Point(0, 0);
-            dataGridViewTasks.Name = "dataGridView1";
+            dataGridViewTasks.Name = "dataGridViewTasks";
             dataGridViewTasks.RowHeadersVisible = false;
             dataGridViewTasks.RowTemplate.Height = 25;
             dataGridViewTasks.ScrollBars = ScrollBars.Vertical;
@@ -267,7 +304,7 @@
             dataGridViewTasks.Size = new Size(767, 511);
             dataGridViewTasks.TabIndex = 12;
             dataGridViewTasks.CellEndEdit += SaveCellEdit;
-            dataGridViewTasks.CellMouseDown += DataGridView1_CellMouseDown;
+            dataGridViewTasks.CellMouseDown += DataGridViewTasksCellMouseDown;
             // 
             // contextMenu
             // 
@@ -280,16 +317,7 @@
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             deleteToolStripMenuItem.Size = new Size(107, 22);
             deleteToolStripMenuItem.Text = "Delete";
-            deleteToolStripMenuItem.Click += DeleteToolStripMenuItem_Click;
-            // 
-            // labelOnline
-            // 
-            labelOnline.AutoSize = true;
-            labelOnline.Location = new Point(12, 537);
-            labelOnline.Name = "labelOnline";
-            labelOnline.Size = new Size(38, 15);
-            labelOnline.TabIndex = 4;
-            labelOnline.Text = "label1";
+            deleteToolStripMenuItem.Click += DeleteToolStripMenuItemClick;
             // 
             // MainForm
             // 
@@ -304,10 +332,12 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Snowfall";
-            Load += Form1_Load;
-            KeyDown += MainForm_KeyDown;
+            Load += MainFormLoad;
+            KeyDown += MainFormKeyDown;
             panelMenu.ResumeLayout(false);
             panelMenu.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureOffline).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureOnline).EndInit();
             panelLogo.ResumeLayout(false);
             panelLogo.PerformLayout();
             panelTitleBar.ResumeLayout(false);
@@ -319,15 +349,10 @@
 
         #endregion
         private Panel panelMenu;
-        private Button buttonList;
         private Panel panelLogo;
-        private Button buttonNote;
-        private Panel panelTitleBar;
         private Label labelLogo;
         private Panel panelDesktop;
-        private Button buttonSettings;
         private Button buttonClose;
-        private DataGridView dataGridViewTasks;
         private ContextMenuStrip contextMenu;
         private ToolStripMenuItem deleteToolStripMenuItem;
         private Button buttonAll;
@@ -338,5 +363,12 @@
         private ToolTip toolTipFalse;
         private ToolTip toolTipTrue;
         private Label labelOnline;
+        public Button buttonList;
+        public Button buttonNote;
+        public Button buttonSettings;
+        private PictureBox pictureOnline;
+        private PictureBox pictureOffline;
+        public Panel panelTitleBar;
+        public DataGridView dataGridViewTasks;
     }
 }

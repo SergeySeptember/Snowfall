@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             textBoxBody = new TextBox();
             dataGridViewNotes = new DataGridView();
             contextMenu = new ContextMenuStrip(components);
@@ -41,65 +41,67 @@
             // 
             // textBoxBody
             // 
-            textBoxBody.Location = new Point(221, 12);
+            textBoxBody.Location = new Point(40, 1);
             textBoxBody.Multiline = true;
             textBoxBody.Name = "textBoxBody";
-            textBoxBody.Size = new Size(518, 448);
+            textBoxBody.Size = new Size(708, 495);
             textBoxBody.TabIndex = 1;
-            textBoxBody.KeyDown += textBoxBody_KeyDown;
+            textBoxBody.KeyDown += TextBoxBodyKeyDown;
             // 
             // dataGridViewNotes
             // 
             dataGridViewNotes.BackgroundColor = SystemColors.ControlLightLight;
             dataGridViewNotes.BorderStyle = BorderStyle.None;
             dataGridViewNotes.CellBorderStyle = DataGridViewCellBorderStyle.None;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.TopCenter;
-            dataGridViewCellStyle3.BackColor = SystemColors.Control;
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
-            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(0, 150, 136);
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            dataGridViewNotes.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.TopCenter;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(0, 150, 136);
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dataGridViewNotes.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dataGridViewNotes.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = SystemColors.Window;
-            dataGridViewCellStyle4.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle4.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle4.SelectionBackColor = Color.FromArgb(0, 150, 136);
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.False;
-            dataGridViewNotes.DefaultCellStyle = dataGridViewCellStyle4;
-            dataGridViewNotes.Location = new Point(26, 12);
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Window;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(0, 150, 136);
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            dataGridViewNotes.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewNotes.Location = new Point(-138, 1);
             dataGridViewNotes.Name = "dataGridViewNotes";
             dataGridViewNotes.RowHeadersVisible = false;
             dataGridViewNotes.RowTemplate.Height = 25;
             dataGridViewNotes.ScrollBars = ScrollBars.Vertical;
             dataGridViewNotes.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            dataGridViewNotes.Size = new Size(179, 448);
+            dataGridViewNotes.Size = new Size(172, 495);
             dataGridViewNotes.TabIndex = 13;
-            dataGridViewNotes.CellClick += dataGridViewNotes_CellClick;
-            dataGridViewNotes.CellEndEdit += dataGridViewNotes_CellEndEdit;
-            dataGridViewNotes.CellMouseDown += dataGridViewNotes_CellMouseDown;
+            dataGridViewNotes.CellClick += DataGridViewNotesCellClick;
+            dataGridViewNotes.CellEndEdit += DataGridViewNotesCellEndEdit;
+            dataGridViewNotes.CellMouseDown += DataGridViewNotesCellMouseDown;
+            dataGridViewNotes.MouseEnter += DataGridViewNotesMouseEnter;
+            dataGridViewNotes.MouseLeave += DataGridViewNotesMouseLeave;
             // 
             // contextMenu
             // 
             contextMenu.Items.AddRange(new ToolStripItem[] { deleteToolStripMenuItem });
             contextMenu.Name = "contextMenu";
-            contextMenu.Size = new Size(181, 48);
+            contextMenu.Size = new Size(108, 26);
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new Size(180, 22);
+            deleteToolStripMenuItem.Size = new Size(107, 22);
             deleteToolStripMenuItem.Text = "Delete";
-            deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
+            deleteToolStripMenuItem.Click += DeleteToolStripMenuItemClick;
             // 
             // FormNotes
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(751, 472);
+            ClientSize = new Size(751, 508);
             Controls.Add(dataGridViewNotes);
             Controls.Add(textBoxBody);
             Name = "FormNotes";
